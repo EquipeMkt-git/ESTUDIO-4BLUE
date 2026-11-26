@@ -188,8 +188,23 @@ async function desenharYt(){
     y.configurado?
     `O sistema ainda não está ligado ao canal. Clique e, na tela do Google, <b>escolha o canal da 4blue</b>.
      <div style="margin-top:10px"><button class="pri" id="bYtCon">Conectar canal do YouTube</button></div>`:
-    `Para criar as lives direto no canal da 4blue falta um passo técnico: o cliente OAuth do Google Cloud (YT_CLIENT_ID e YT_CLIENT_SECRET nas Propriedades do Apps Script, com esta URL de retorno: <code style="word-break:break-all">${esc(y.redirect||'')}</code>).
-     <br><br>Enquanto isso, crie a live no YouTube Studio e cole o link no card.`;
+    `Para criar as lives direto no canal da 4blue, cole aqui o <b>ID do cliente</b> e a <b>chave secreta</b> do cliente OAuth criado no Google Cloud (projeto <b>Estudio 4blue</b>).
+     <label class="rot">ID do cliente</label><input id="ytId" autocomplete="off" placeholder="....apps.googleusercontent.com">
+     <label class="rot">Chave secreta do cliente</label><input id="ytSeg" type="password" autocomplete="off">
+     <div style="margin-top:10px"><button class="pri" id="bYtSalvar">Salvar e conectar o canal</button></div>
+     <p class="dica">URL de retorno cadastrada no cliente: <code style="word-break:break-all">${esc(y.redirect||'')}</code></p>`;
+  const bs=$('bYtSalvar');
+  if(bs) bs.onclick=async()=>{
+    bs.disabled=true;
+    try{
+      ytInfo=await Api.post('youtube.config',{clientId:$('ytId').value,clientSecret:$('ytSeg').value});
+      const r=await Api.post('youtube.conectar');
+      window.open(r.url,'conectarYT','width=520,height=680');
+      aviso('Na janela do Google, escolha o canal da 4blue. Depois volte e abra Admins de novo.',8000);
+      desenharYt();
+    }catch(e){aviso(e.message,6000)}
+    bs.disabled=false;
+  };
   const b=$('bYtCon');
   if(b) b.onclick=async()=>{try{const r=await Api.post('youtube.conectar');window.open(r.url,'conectarYT','width=520,height=680');aviso('Depois de escolher o canal, volte aqui e abra Admins de novo',6000)}catch(e){aviso(e.message)}};
 }

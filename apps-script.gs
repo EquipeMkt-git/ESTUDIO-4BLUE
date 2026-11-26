@@ -47,6 +47,7 @@ function acao_(a, b, u) {
     case 'live.youtube': return youtubeCriar_(b.id, u);
     case 'youtube.status': return youtubeStatus_();
     case 'youtube.conectar': return youtubeConectarUrl_(u);
+    case 'youtube.config': return youtubeConfig_(b, u);
     case 'youtube.chave': return youtubeChave_(u);
     case 'live.youtubeLink': return youtubeLinkManual_(b.id, b.link);
     case 'chat.list': return chatLer_(b.id, b.desde, true);
@@ -221,7 +222,19 @@ function convidado_(a, b) {
    Precisa de um cliente OAuth do Google Cloud (YT_CLIENT_ID / YT_CLIENT_SECRET nas Propriedades do script),
    com a URL /exec desta implantação cadastrada como "URI de redirecionamento autorizado". */
 function ytConfig_() { var p = props_(); return { id: p.getProperty('YT_CLIENT_ID'), segredo: p.getProperty('YT_CLIENT_SECRET'), refresh: p.getProperty('YT_REFRESH') }; }
-function urlExec_() { return ScriptApp.getService().getUrl(); }
+// URL pública desta implantação (sem /a/4blue.com.br/), usada como retorno do OAuth
+var EXEC_URL = 'https://script.google.com/macros/s/AKfycbzsagO8ncb6KkLMIZ22VLI3hgEjcCuOyqWLYdhxnZScF2SdIKmwWmkXBxbO-x33etea/exec';
+function urlExec_() { return EXEC_URL; }
+function youtubeConfig_(b, u) {
+  precisaAdmin_(u);
+  var id = String(b.clientId || '').trim(), seg = String(b.clientSecret || '').trim();
+  if (!/.apps.googleusercontent.com$/.test(id)) return { ok: false, erro: 'O ID do cliente termina com .apps.googleusercontent.com' };
+  if (seg.length < 10) return { ok: false, erro: 'Cole a chave secreta do cliente.' };
+  props_().setProperties({ YT_CLIENT_ID: id, YT_CLIENT_SECRET: seg });
+  props_().deleteProperty('YT_REFRESH');
+  CacheService.getScriptCache().remove('yt_access');
+  return youtubeStatus_();
+}
 function youtubeStatus_() {
   var c = ytConfig_(), canal = null;
   try { canal = JSON.parse(props_().getProperty('YT_CANAL') || 'null'); } catch (x) {}
