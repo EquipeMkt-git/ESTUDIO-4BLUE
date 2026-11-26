@@ -1,0 +1,22 @@
+/* Estúdio 4blue — fontes e cores da ID (empresa = azul, campanha Black = preto/dourado) */
+@font-face{font-family:KO;src:url(assets/knockout-50.otf)}
+@font-face{font-family:Montserrat;font-weight:600;src:url(assets/Montserrat-SemiBold.ttf)}
+@font-face{font-family:Montserrat;font-weight:700;src:url(assets/Montserrat-Bold.ttf)}
+@font-face{font-family:Montserrat;font-weight:800;src:url(assets/Montserrat-ExtraBold.ttf)}
+@font-face{font-family:Montserrat;font-weight:900;src:url(assets/Montserrat-Black.ttf)}
+
+:root{
+  --claro:#F4F5FF; --azul:#0072CE; --marinho:#004882; --ciano:#1998FF; --amarelo:#F6BF00;
+  --destaque:var(--amarelo); --faixa:var(--azul); --faixa2:var(--marinho); --texto:#fff;
+  --fundo:url(assets/fundo-azul.png); --fundo-cor:#004280;
+}
+body.black{
+  --destaque:#E8C26A; --faixa:#111; --faixa2:#000; --texto:#fff;
+  --fundo:url(assets/fundo-black.png); --fundo-cor:#000;
+  --ouro:linear-gradient(90deg,#B8862F,#F3D98B 45%,#C8963A);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:transparent;color:var(--texto);
+  font-family:Montserrat,sans-serif;-webkit-font-smoothing:antialiased}
+.ko{font-family:KO,Montserrat,sans-serif;text-transform:uppercase;letter-spacing:.01em;line-height:.9}
+.num{font-family:Montserrat;font-weight:900}

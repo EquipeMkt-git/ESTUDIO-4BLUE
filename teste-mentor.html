@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste antes da live — 4blue</title>
+<style>
+@font-face{font-family:Montserrat;font-weight:600;src:url(assets/Montserrat-SemiBold.ttf)}
+@font-face{font-family:Montserrat;font-weight:700;src:url(assets/Montserrat-Bold.ttf)}
+@font-face{font-family:Montserrat;font-weight:800;src:url(assets/Montserrat-ExtraBold.ttf)}
+:root{--azul:#0072CE;--marinho:#004882;--claro:#F4F5FF;--amarelo:#F6BF00;--ok:#16a34a;--ruim:#dc2626}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;font:600 16px/1.5 Montserrat,system-ui,sans-serif;background:var(--claro);color:#0b1b33}
+header{background:var(--marinho) url(assets/fundo-azul.png) left bottom/cover;color:#fff;padding:28px 20px 34px}
+header .in,main{max-width:860px;margin:0 auto}
+header img{height:34px}
+h1{font:800 44px/1.05 Montserrat,sans-serif;letter-spacing:-.01em;text-transform:uppercase;margin:18px 0 8px}
+header p{margin:0;opacity:.9;max-width:620px}
+main{padding:20px}
+.passo{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,40,90,.06)}
+.passo h2{margin:0 0 10px;font-size:18px;display:flex;gap:10px;align-items:center}
+.passo h2 .n{background:var(--azul);color:#fff;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:14px;flex:none}
+.passo h2 .st{margin-left:auto;font-size:13px;padding:3px 10px;border-radius:99px;background:#e5e9f5;color:#55607a}
+.passo h2 .st.ok{background:#dcfce7;color:var(--ok)} .passo h2 .st.ruim{background:#fee2e2;color:var(--ruim)}
+button{font:inherit;font-weight:800;border:0;border-radius:10px;padding:12px 18px;background:var(--azul);color:#fff;cursor:pointer}
+button.sec{background:#e5e9f5;color:var(--marinho)}
+select{font:inherit;padding:10px;border-radius:10px;border:1px solid #cbd3e6;width:100%;background:#fff}
+label{display:block;font-size:13px;color:#55607a;margin:12px 0 4px}
+.grade{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+@media(max-width:700px){.grade{grid-template-columns:1fr} h1{font-size:34px}}
+video{width:100%;aspect-ratio:16/9;background:#0b1b33;border-radius:12px;object-fit:cover;transform:scaleX(-1)}
+.medidor{height:14px;background:#e5e9f5;border-radius:7px;overflow:hidden;margin-top:6px}
+.medidor i{display:block;height:100%;width:0;background:linear-gradient(90deg,#16a34a 0 70%,#eab308 70% 88%,#dc2626 88%);transition:width .06s}
+.dica{font-size:14px;color:#55607a;margin:8px 0 0}
+ul.check{list-style:none;padding:0;margin:0}
+ul.check li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #eef1f8}
+ul.check input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:var(--azul)}
+.res{font-size:14px;margin-top:8px}
+.final{background:var(--azul);color:#fff;text-align:center}
+.final h2{justify-content:center}
+.final b{color:var(--amarelo)}
+</style></head>
+<body>
+<header><div class="in">
+  <img src="assets/logo-4blue-branca.png" alt="4blue">
+  <h1>Teste antes da live</h1>
+  <p>Leva 3 minutos. Faça no mesmo computador, no mesmo lugar e com a mesma internet que você vai usar na aula.</p>
+</div></header>
+<main>
+  <section class="passo">
+    <h2><span class="n">1</span>Câmera e microfone <span class="st" id="st1">não testado</span></h2>
+    <button id="bLiberar">Liberar câmera e microfone</button>
+    <p class="dica">O navegador vai pedir permissão. Clique em <b>Permitir</b>. Nada é gravado nem enviado: tudo fica no seu computador.</p>
+    <div class="grade" id="area" hidden style="margin-top:14px">
+      <div><video id="video" autoplay playsinline muted></video><div class="res" id="resol"></div></div>
+      <div>
+        <label>Câmera</label><select id="selCam"></select>
+        <label>Microfone</label><select id="selMic"></select>
+        <label>Fale normalmente: a barra deve passar da metade</label>
+        <div class="medidor"><i id="nivel"></i></div>
+        <p class="dica" id="dicaMic"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="passo">
+    <h2><span class="n">2</span>Som (fone de ouvido) <span class="st" id="st2">não testado</span></h2>
+    <p class="dica" style="margin-top:0">Use <b>fone de ouvido</b> na live. Sem fone, o som dos outros volta pelo seu microfone e vira eco.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <button id="bSom" class="sec">▶ Tocar som de teste</button>
+      <button id="bOuvi" class="sec">Ouvi no fone</button>
+    </div>
+  </section>
+
+  <section class="passo">
+    <h2><span class="n">3</span>Internet <span class="st" id="st3">não testado</span></h2>
+    <p class="dica" style="margin-top:0">Abra o teste abaixo, deixe rodar 1 minuto e volte aqui. Se possível, use <b>cabo de rede</b> em vez de Wi-Fi.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <a href="https://vdo.ninja/speedtest" target="_blank" rel="noopener"><button class="sec">Abrir teste de conexão</button></a>
+      <button id="bNetOk" class="sec">O vídeo ficou fluido</button>
+    </div>
+    <div class="res" id="rede"></div>
+  </section>
+
+  <section class="passo">
+    <h2><span class="n">4</span>Ambiente <span class="st" id="st4">0 de 6</span></h2>
+    <ul class="check" id="check">
+      <li><input type="checkbox"><span>Luz <b>de frente</b> para o rosto (janela ou luminária atrás da câmera, nunca atrás de você)</span></li>
+      <li><input type="checkbox"><span>Câmera na altura dos olhos, com você centralizado</span></li>
+      <li><input type="checkbox"><span>Fundo arrumado e sem gente passando</span></li>
+      <li><input type="checkbox"><span>Celular no silencioso e notificações do computador desligadas</span></li>
+      <li><input type="checkbox"><span>Computador na tomada e outros programas pesados fechados</span></li>
+      <li><input type="checkbox"><span>Se for mostrar slides, arquivo já aberto e testado</span></li>
+    </ul>
+  </section>
+
+  <section class="passo final" id="final" hidden>
+    <h2>Tudo pronto!</h2>
+    <p>No dia da live, abra o <b>link de convidado</b> que a equipe 4blue mandou, uns 15 minutos antes do horário. Você vai cair nos bastidores e a equipe te coloca no ar.</p>
+  </section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let stream=null,ctx=null,analisador=null,picoFala=0;
+const feito={1:false,2:false,3:false,4:false};
+function marca(n,ok,txt){const s=$('st'+n);s.className='st '+(ok?'ok':'ruim');s.textContent=txt;feito[n]=ok;$('final').hidden=!Object.values(feito).every(Boolean)}
+
+async function abrir(){
+  try{
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+    const cam=$('selCam').value,mic=$('selMic').value;
+    stream=await navigator.mediaDevices.getUserMedia({
+      video:cam?{deviceId:{exact:cam},width:{ideal:1280},height:{ideal:720}}:{width:{ideal:1280},height:{ideal:720}},
+      audio:mic?{deviceId:{exact:mic},echoCancellation:true,noiseSuppression:true}:{echoCancellation:true,noiseSuppression:true}
+    });
+    $('video').srcObject=stream;$('area').hidden=false;
+    await listar();
+    const v=stream.getVideoTracks()[0].getSettings();
+    const bom=(v.height||0)>=720;
+    $('resol').textContent=`Sua câmera está enviando ${v.width}x${v.height}`+(bom?' — ótimo.':' — abaixo de 720p. Se tiver outra câmera, teste ela.');
+    medir();
+    marca(1,true,'funcionando');
+  }catch(e){
+    marca(1,false,'bloqueado');
+    alert('Não consegui acessar a câmera ou o microfone. Clique no cadeado ao lado do endereço do site, permita câmera e microfone e tente de novo. Feche também Zoom, Teams ou outro programa que esteja usando a câmera.');
+  }
+}
+async function listar(){
+  const d=await navigator.mediaDevices.enumerateDevices();
+  const encher=(sel,tipo,atual)=>{sel.innerHTML='';d.filter(x=>x.kind===tipo).forEach((x,i)=>{const o=document.createElement('option');o.value=x.deviceId;o.textContent=x.label||(tipo==='videoinput'?'Câmera ':'Microfone ')+(i+1);sel.appendChild(o)});if(atual)sel.value=atual};
+  encher($('selCam'),'videoinput',stream&&stream.getVideoTracks()[0].getSettings().deviceId);
+  encher($('selMic'),'audioinput',stream&&stream.getAudioTracks()[0].getSettings().deviceId);
+}
+function medir(){
+  ctx=ctx||new AudioContext();
+  const src=ctx.createMediaStreamSource(stream);analisador=ctx.createAnalyser();analisador.fftSize=1024;src.connect(analisador);
+  const buf=new Float32Array(analisador.fftSize);
+  (function loop(){
+    if(!analisador) return;
+    analisador.getFloatTimeDomainData(buf);let p=0;for(const x of buf)p=Math.max(p,Math.abs(x));
+    const db=p>0?20*Math.log10(p):-60;const pct=Math.max(0,Math.min(100,(db+60)/60*100));
+    $('nivel').style.width=pct+'%';picoFala=Math.max(picoFala*0.995,pct);
+    $('dicaMic').textContent=picoFala<35?'Muito baixo: aproxime o microfone ou aumente o volume dele no computador.':picoFala>92?'Alto demais, pode distorcer: afaste um pouco o microfone.':'Volume bom.';
+    requestAnimationFrame(loop);
+  })();
+}
+$('bLiberar').onclick=abrir;
+$('selCam').onchange=abrir;$('selMic').onchange=()=>{analisador=null;abrir()};
+
+$('bSom').onclick=()=>{
+  ctx=ctx||new AudioContext();const o=ctx.createOscillator(),g=ctx.createGain();
+  o.frequency.value=660;g.gain.setValueAtTime(0.0001,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.25,ctx.currentTime+0.05);g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+1.2);
+  o.connect(g).connect(ctx.destination);o.start();o.stop(ctx.currentTime+1.3);
+};
+$('bOuvi').onclick=()=>marca(2,true,'ok');
+
+$('bNetOk').onclick=()=>marca(3,true,'ok');
+const c=navigator.connection;
+if(c){$('rede').textContent=`Seu navegador indica conexão ${c.effectiveType||''}${c.downlink?' (~'+c.downlink+' Mbps de download)':''}${c.type==='wifi'?' por Wi-Fi':''}. O que vale é o teste acima.`}
+
+const caixas=[...document.querySelectorAll('#check input')];
+caixas.forEach(x=>x.onchange=()=>{const n=caixas.filter(c=>c.checked).length;const s=$('st4');s.textContent=n+' de '+caixas.length;s.className='st'+(n===caixas.length?' ok':'');feito[4]=n===caixas.length;$('final').hidden=!Object.values(feito).every(Boolean)});
+</script>
+</body></html>

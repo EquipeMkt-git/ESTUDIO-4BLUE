@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Estúdio 4blue — painel</title>
+<style>
+@font-face{font-family:KO;src:url(assets/knockout-50.otf)}
+@font-face{font-family:Montserrat;font-weight:600;src:url(assets/Montserrat-SemiBold.ttf)}
+@font-face{font-family:Montserrat;font-weight:700;src:url(assets/Montserrat-Bold.ttf)}
+@font-face{font-family:Montserrat;font-weight:800;src:url(assets/Montserrat-ExtraBold.ttf)}
+:root{--bg:#0b1220;--card:#121b2e;--card2:#182339;--linha:#24314d;--txt:#e8ecf6;--sub:#93a0bd;--azul:#0072CE;--ciano:#1998FF;
+  --ok:#22c55e;--vivo:#ef4444;--amarelo:#F6BF00}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--txt);font:600 14px/1.4 Montserrat,system-ui,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{background:#0d1526;border:1px solid var(--linha);border-radius:8px;padding:8px 10px;width:100%}
+textarea{resize:vertical;min-height:60px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--azul);border-color:transparent}
+label{display:block;font-size:12px;color:var(--sub);margin:10px 0 4px}
+button{cursor:pointer;border:1px solid var(--linha);background:var(--card2);border-radius:8px;padding:8px 12px;font-weight:700}
+button:hover{border-color:var(--ciano)}
+button:active{transform:translateY(1px)}
+button.pri{background:var(--azul);border-color:var(--azul)}
+button.perigo{background:#3a1218;border-color:#7f1d1d}
+button.on{background:var(--ok);border-color:var(--ok);color:#03210f}
+button:disabled{opacity:.45;cursor:not-allowed}
+.linha{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.linha>*{flex:1}
+.linha>button{flex:none}
+
+header{display:flex;align-items:center;gap:14px;padding:10px 18px;background:#0a101c;border-bottom:1px solid var(--linha);position:sticky;top:0;z-index:5}
+header img{height:26px}
+header h1{font:400 26px KO,sans-serif;letter-spacing:.02em;margin:0;text-transform:uppercase}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:99px;background:var(--card2);font-size:12px}
+.pill i{width:8px;height:8px;border-radius:50%;background:#64748b}
+.pill.ok i{background:var(--ok)} .pill.erro i{background:var(--vivo)}
+.esp{flex:1}
+#bTransmitir.vivo{background:var(--vivo);border-color:var(--vivo);animation:pulsa 1.6s infinite}
+#bGravar.vivo{background:#7c2d12;border-color:#ea580c}
+@keyframes pulsa{50%{box-shadow:0 0 0 6px rgba(239,68,68,.25)}}
+.stats{font-size:12px;color:var(--sub);min-width:190px;text-align:right}
+
+main{display:grid;grid-template-columns:minmax(420px,1.25fr) minmax(330px,1fr) minmax(360px,1fr);gap:14px;padding:14px;align-items:start}
+@media(max-width:1250px){main{grid-template-columns:1fr 1fr}}
+@media(max-width:820px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--linha);border-radius:14px;padding:14px}
+.card+.card{margin-top:14px}
+.card h2{margin:0 0 10px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);display:flex;align-items:center;gap:8px}
+.card h2 .esp{flex:1}
+.prev{aspect-ratio:16/9;background:#000;border-radius:10px;overflow:hidden;display:grid;place-items:center;color:var(--sub);position:relative}
+.prev img{width:100%;height:100%;object-fit:contain;display:block}
+.prev .tag{position:absolute;top:8px;left:8px;background:var(--vivo);color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;letter-spacing:.1em}
+
+.cenas{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.cena{padding:12px 8px;text-align:left;min-height:62px;display:flex;flex-direction:column;justify-content:space-between}
+.cena small{color:var(--sub);font-size:11px}
+.cena b{font-size:14px}
+.cena.no-ar{background:var(--vivo);border-color:var(--vivo)}
+.cena.no-ar small{color:#ffe4e4}
+.cena.socorro{border-color:#7f1d1d}
+
+.vaga{background:var(--card2);border:1px solid var(--linha);border-radius:12px;padding:10px;margin-bottom:10px}
+.vaga .topo{display:flex;align-items:center;gap:8px}
+.vaga .topo b{font-size:12px;letter-spacing:.1em;color:var(--sub);width:86px;flex:none}
+.vaga .acoes{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.vaga .acoes button{padding:6px 9px;font-size:12px}
+.medidor{height:6px;background:#0d1526;border-radius:3px;overflow:hidden;margin-top:8px}
+.medidor i{display:block;height:100%;width:0;background:linear-gradient(90deg,#22c55e 0 70%,#eab308 70% 88%,#ef4444 88%);transition:width .08s}
+button.mudo{background:#3a1218;border-color:#ef4444;color:#fecaca}
+
+.abas{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.abas button{flex:1;padding:8px 6px;font-size:12px}
+.abas button.sel{background:var(--azul);border-color:var(--azul)}
+.aba{display:none}.aba.sel{display:block}
+.chat{max-height:420px;overflow:auto;display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.msg{background:var(--card2);border:1px solid var(--linha);border-radius:10px;padding:8px 10px;cursor:pointer;display:flex;gap:8px}
+.msg:hover{border-color:var(--ciano)}
+.msg.destaque{border-color:var(--amarelo);background:#2a2410}
+.msg img{width:28px;height:28px;border-radius:50%;flex:none;object-fit:cover}
+.msg .n{font-size:12px;color:var(--ciano)}
+.msg .t{font-weight:600}
+.vazio{color:var(--sub);font-size:13px;padding:10px 0}
+.dica{color:var(--sub);font-size:12px;font-weight:600;margin:6px 0 0}
+.log{background:#070c16;border-radius:8px;padding:8px;font:12px/1.5 Consolas,monospace;max-height:160px;overflow:auto;color:#9fb3d9;white-space:pre-wrap;margin-top:8px}
+.links .l{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.links .l span{width:110px;flex:none;font-size:12px;color:var(--sub)}
+.links input{font-size:11px}
+details summary{cursor:pointer;color:var(--sub);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin:6px 0}
+iframe.diretor{width:100%;height:520px;border:0;border-radius:10px;background:#000}
+.aviso{background:#2a2410;border:1px solid #6b5a12;color:#fde68a;border-radius:10px;padding:10px;font-size:13px;margin-bottom:10px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#111a2c;border:1px solid var(--ciano);padding:10px 16px;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9}
+.toast.on{opacity:1}
+kbd{background:#0d1526;border:1px solid var(--linha);border-radius:4px;padding:0 5px;font-size:11px}
+</style></head>
+<body>
+<header>
+  <img src="assets/logo-4blue-branca.png" alt="4blue">
+  <h1>Estúdio</h1>
+  <span class="pill" id="pObs"><i></i><span>OBS desconectado</span></span>
+  <span class="pill" id="pChat"><i></i><span>Chat desligado</span></span>
+  <span class="esp"></span>
+  <span class="stats" id="stats"></span>
+  <button id="bGravar" disabled>● Gravar</button>
+  <button id="bTransmitir" class="pri" disabled>Iniciar transmissão</button>
+</header>
+
+<main>
+<!-- COLUNA 1: programa e cenas -->
+<section>
+  <div class="card">
+    <h2>No ar <span class="esp"></span><label style="margin:0;display:flex;gap:6px;align-items:center;font-size:11px;letter-spacing:0;text-transform:none"><input type="checkbox" id="cPrevia" checked style="width:auto"> prévia</label></h2>
+    <div class="prev" id="prev"><span>Conecte o OBS para ver a prévia</span></div>
+  </div>
+  <div class="card">
+    <h2>Cenas <span class="esp"></span><span style="letter-spacing:0;text-transform:none;font-size:11px">atalhos <kbd>1</kbd>…<kbd>0</kbd></span></h2>
+    <div class="cenas" id="cenas"></div>
+    <p class="dica">Em <b>Solo</b> e <b>Tela + mentor</b>, escolha quem aparece nos botões de cada convidado.</p>
+  </div>
+  <div class="card">
+    <h2>Vídeo</h2>
+    <label>Vídeos (um caminho de arquivo por linha, ex.: F:\VIDEOS\vinheta.mp4)</label>
+    <textarea id="vLista" rows="3" placeholder="F:\4BLUE\...\vinheta.mp4"></textarea>
+    <div class="linha" style="margin-top:8px">
+      <select id="vSel"></select>
+      <button class="pri" id="vTocar">▶ Tocar no ar</button>
+    </div>
+    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="vVoltar" checked style="width:auto"> Ao terminar, voltar para a cena anterior</label>
+    <p class="dica" id="vStatus"></p>
+  </div>
+</section>
+
+<!-- COLUNA 2: convidados -->
+<section>
+  <div class="card">
+    <h2>Convidados <span class="esp"></span><button id="bDiretor" style="font-size:11px;padding:5px 8px">Abrir bastidores</button></h2>
+    <div id="vagas"></div>
+    <p class="dica">Quem entra pelo link fica nos <b>bastidores</b>: aparece nos bastidores (sala do diretor), mas só vai ao ar quando você escolhe uma cena em que ele aparece.</p>
+  </div>
+  <div class="card" id="cardDiretor" hidden>
+    <h2>Bastidores (VDO.Ninja) <span class="esp"></span><button id="bDiretorAba" style="font-size:11px;padding:5px 8px">Abrir em outra aba</button></h2>
+    <iframe class="diretor" id="ifDiretor" allow="camera;microphone;display-capture;autoplay;clipboard-write;fullscreen"></iframe>
+    <p class="dica">Aqui você fala com os convidados, silencia, manda mensagem e grava cada um em separado (botão de gravar do diretor).</p>
+  </div>
+</section>
+
+<!-- COLUNA 3: abas -->
+<section>
+  <div class="card">
+    <div class="abas" id="abas">
+      <button data-aba="tTexto" class="sel">Banner</button>
+      <button data-aba="tChat">Comentários</button>
+      <button data-aba="tTelas">Telas</button>
+      <button data-aba="tConfig">Configurar</button>
+    </div>
+
+    <div class="aba sel" id="tTexto">
+      <h2>Banner com nome</h2>
+      <div class="linha"><input id="bNome" placeholder="Nome (ex.: Renan Kaminski)"><button id="bBanner">Mostrar</button></div>
+      <input id="bCargo" placeholder="Cargo ou assunto (opcional)" style="margin-top:6px">
+      <h2 style="margin-top:18px">Letreiro</h2>
+      <div class="linha"><input id="lTag" placeholder="Ao vivo" style="max-width:110px"><input id="lTexto" placeholder="Texto que corre na parte de baixo"><button id="bLetreiro">Mostrar</button></div>
+      <h2 style="margin-top:18px">Chamada com QR code</h2>
+      <input id="kTitulo" placeholder="Título (ex.: Garanta sua vaga)">
+      <input id="kTexto" placeholder="Texto curto (ex.: Aponte a câmera do celular)" style="margin-top:6px">
+      <input id="kLink" placeholder="Link do QR (https://...)" style="margin-top:6px">
+      <div class="linha" style="margin-top:6px"><input id="kLinkTexto" placeholder="Link escrito na tela (ex.: 4blue.com.br/oferta)"><button id="bCta">Mostrar</button></div>
+      <h2 style="margin-top:18px">Logo e tema</h2>
+      <div class="linha">
+        <select id="sTema"><option value="azul">Tema 4blue (azul)</option><option value="black">Tema Black Friday</option></select>
+        <button id="bLogo" class="on">Logo visível</button>
+      </div>
+    </div>
+
+    <div class="aba" id="tChat">
+      <h2>Comentários da live <span class="esp"></span><button id="bTirarComent" style="font-size:11px;padding:5px 8px">Tirar da tela</button></h2>
+      <input id="chatBusca" placeholder="Filtrar por nome ou palavra">
+      <div class="chat" id="chat"><div class="vazio">Os comentários aparecem aqui quando o Social Stream Ninja estiver ligado (veja Configurar). Clique em um para mostrar na live.</div></div>
+      <details><summary>Comentário manual</summary>
+        <input id="mNome" placeholder="Nome">
+        <textarea id="mTexto" placeholder="Comentário" style="margin-top:6px"></textarea>
+        <button id="bManual" style="margin-top:6px">Mostrar na live</button>
+      </details>
+    </div>
+
+    <div class="aba" id="tTelas">
+      <h2>Abertura</h2>
+      <input id="tTitulo" placeholder="Título da aula">
+      <input id="tSub" placeholder="Subtítulo (ex.: Aula ao vivo com Renan Kaminski)" style="margin-top:6px">
+      <label>Horário de início (contagem regressiva)</label>
+      <input id="tInicio" type="time">
+      <h2 style="margin-top:18px">Intervalo</h2>
+      <div class="linha"><button data-int="5">5 min</button><button data-int="10">10 min</button><button data-int="15">15 min</button><button data-int="0">Sem contagem</button></div>
+      <p class="dica">O botão já coloca a tela de intervalo no ar com a contagem.</p>
+      <input id="tTxtInt" placeholder="Texto do intervalo (opcional)" style="margin-top:6px">
+      <h2 style="margin-top:18px">Voltamos já</h2>
+      <input id="tTxtVolt" placeholder="Texto (opcional)">
+      <h2 style="margin-top:18px">Encerramento</h2>
+      <input id="tFimChapeu" placeholder="Linha de cima (ex.: Obrigado por assistir)">
+      <input id="tFimTitulo" placeholder="Título (ex.: Até a próxima)" style="margin-top:6px">
+      <input id="tFimTexto" placeholder="Texto" style="margin-top:6px">
+    </div>
+
+    <div class="aba" id="tConfig">
+      <div class="aviso" id="avisoPasta" hidden>Abra este painel direto do arquivo (duplo clique em <b>painel.html</b>) ou preencha a pasta abaixo, para o OBS achar as telas.</div>
+      <h2>OBS</h2>
+      <div class="linha"><input id="cHost" placeholder="127.0.0.1"><input id="cPorta" placeholder="4455" style="max-width:90px"></div>
+      <label>Senha do WebSocket (OBS → Ferramentas → Configurações do servidor WebSocket)</label>
+      <div class="linha"><input id="cSenha" type="password" autocomplete="off"><button class="pri" id="bConectar">Conectar</button></div>
+      <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="cLembrar" style="width:auto"> Lembrar a senha neste computador</label>
+      <label>Pasta do Estúdio (onde está este painel)</label>
+      <input id="cPasta" placeholder="F:\4BLUE\ACESSO CLAUDE IA\ESTUDIO-4BLUE">
+
+      <h2 style="margin-top:18px">Sala dos convidados (VDO.Ninja)</h2>
+      <div class="linha"><input id="cSala" placeholder="nome da sala, sem espaço"><input id="cSenhaSala" placeholder="senha da sala"></div>
+      <button id="bSorteio" style="margin-top:6px;font-size:12px">Gerar sala e senha novas</button>
+      <p class="dica">Use uma sala e senha diferentes para cada live. Quem tiver o link entra nos bastidores.</p>
+
+      <h2 style="margin-top:18px">Comentários (Social Stream Ninja)</h2>
+      <label>ID da sessão (aparece na extensão do Social Stream)</label>
+      <div class="linha"><input id="cSessao" placeholder="ex.: Xa9fK2"><button id="bChat">Ligar</button></div>
+
+      <h2 style="margin-top:18px">Montar no OBS</h2>
+      <p class="dica">Ordem: 1) Ajustar vídeo 1080p30 (uma vez) 2) Montar / atualizar estúdio.</p>
+      <div class="linha"><button id="bVideo" disabled>1. Ajustar vídeo 1080p30</button><button class="pri" id="bMontar" disabled>2. Montar / atualizar estúdio</button></div>
+      <button id="bRefazer" disabled style="margin-top:6px;font-size:12px">Refazer cenas do zero</button>
+      <div class="log" id="log" hidden></div>
+
+      <h2 style="margin-top:18px">Links</h2>
+      <div class="links" id="links"></div>
+    </div>
+  </div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="obs.js"></script>
+<script src="montar.js"></script>
+<script src="painel.js"></script>
+</body></html>
