@@ -354,6 +354,7 @@ function desenharLinks(){
   const L=[];
   VAGAS.forEach(v=>L.push([v.rotulo+(cfg.nomes[v.id]?' ('+cfg.nomes[v.id]+')':''),linkConvidado(cfg,v.id,cfg.nomes[v.id])]));
   L.push(['Bastidores',linkDiretor(cfg)]);
+  L.push(['Teste do mentor','https://equipemkt-git.github.io/ESTUDIO-4BLUE/teste-mentor.html']);
   if(cfg.sessao) L.push(['Chat (dock)','https://socialstream.ninja/dock.html?session='+encodeURIComponent(cfg.sessao)]);
   $('links').innerHTML='';
   L.forEach(([r,u])=>{

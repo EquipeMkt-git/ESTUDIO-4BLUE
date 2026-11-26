@@ -68,7 +68,7 @@ Os dois estão no site do OBS, em obsproject.com → Forums → Resources. Insta
 - Em **Configurar**, clique em **Gerar sala e senha novas**. Depois clique em **Montar / atualizar estúdio** para o OBS pegar os links novos.
 - Preencha o nome de cada convidado no painel e use **Copiar link** em cada vaga. Mande para cada pessoa só o link dela.
 - O convidado que vai mostrar slides recebe também o link da **TELA**, para abrir em outra aba e compartilhar a tela.
-- Mande também a página de teste (`teste-mentor.html`, veja "Pendências").
+- Mande também o link do teste: https://equipemkt-git.github.io/ESTUDIO-4BLUE/teste-mentor.html (também aparece em Configurar → Links).
 - Na aba **Telas**, preencha o título da aula e o horário de início (a contagem da abertura usa esse horário).
 - Na aba **Banner**, deixe prontos o letreiro e a chamada com QR.
 
@@ -119,6 +119,6 @@ Os dois estão no site do OBS, em obsproject.com → Forums → Resources. Insta
 - Gere uma sala nova a cada live. Quem tem o link do convidado entra nos bastidores.
 - As chaves do YouTube ficam só no OBS.
 
-## Pendências
-- **Página de teste do mentor:** ela precisa de um endereço público para o mentor abrir. A ideia é publicar a pasta no GitHub Pages da equipe, como o painel da Live 24h. Isso ainda não foi feito e espera o seu OK.
+## Repositório e pendências
+- Código no GitHub: https://github.com/EquipeMkt-git/ESTUDIO-4BLUE (público, sem a fonte Knockout). Para mudar algo, altere aqui na pasta e suba de novo.
 - **Teste com convidado real:** as cenas, telas, overlay, vídeo, banner, letreiro, QR e comentário manual foram testados num OBS isolado. A entrada de um convidado de verdade pelo VDO.Ninja e o chat do Social Stream ainda não, porque precisam de câmera e de uma live real. Faça uma live de teste não listada antes da primeira aula.
