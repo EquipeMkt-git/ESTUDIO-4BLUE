@@ -138,7 +138,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:12px;letter-spacing:.1
 <body>
 <header>
   <img src="assets/logo-4blue-branca.png" alt="4blue">
-  <input id="titulo" placeholder="Nome da live (aparece na abertura)">
+  <input id="titulo" autocomplete="off" placeholder="Nome da live (aparece na abertura)">
   <span class="esp"></span>
   <span id="stats"></span>
   <span class="pill" id="pObs" title="Conexão com o OBS"><i></i><span>OBS</span></span>
@@ -186,7 +186,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:12px;letter-spacing:.1
     <div class="aba sel" id="aComent">
       <div id="chatConfig">
         <label class="rot" style="margin-top:0">Link da live no YouTube</label>
-        <div style="display:flex;gap:8px"><input id="chatLink" placeholder="Cole o link da live"><button class="pri" id="bChat">Ligar</button></div>
+        <div style="display:flex;gap:8px"><input id="chatLink" autocomplete="off" placeholder="Cole o link da live"><button class="pri" id="bChat">Ligar</button></div>
         <p class="dica" id="chatStatus"></p>
       </div>
       <div class="secao" style="margin-top:14px">
@@ -194,7 +194,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:12px;letter-spacing:.1
         <div class="chat" id="chat"></div>
       </div>
       <details><summary>Escrever um comentário</summary>
-        <input id="mNome" placeholder="Nome">
+        <input id="mNome" autocomplete="off" placeholder="Nome">
         <textarea id="mTexto" placeholder="Comentário" style="margin-top:6px"></textarea>
         <button id="bManual" style="margin-top:6px">Mostrar na live</button>
       </details>
@@ -204,7 +204,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:12px;letter-spacing:.1
       <div class="secao">
         <h3>Nome na tela <span class="esp"></span><button class="fantasma" id="bTirarBanner" style="padding:4px 8px;font-size:11px">Tirar</button></h3>
         <div id="listaBanners"></div>
-        <div style="display:flex;gap:6px;margin-top:6px"><input id="nbTitulo" placeholder="Nome ou título"><input id="nbSub" placeholder="Cargo (opcional)"><button id="bAddBanner" title="Adicionar">+</button></div>
+        <div style="display:flex;gap:6px;margin-top:6px"><input id="nbTitulo" autocomplete="off" placeholder="Nome ou título"><input id="nbSub" autocomplete="off" placeholder="Cargo (opcional)"><button id="bAddBanner" title="Adicionar">+</button></div>
         <p class="dica">Clique para mostrar. Clique de novo para tirar.</p>
       </div>
       <div class="secao">
@@ -213,10 +213,10 @@ details summary{cursor:pointer;color:var(--sub);font-size:12px;letter-spacing:.1
       </div>
       <div class="secao">
         <h3>Chamada com QR code <span class="esp"></span><button class="chave" id="kCta" title="Mostrar chamada"></button></h3>
-        <input id="kTitulo" placeholder="Título (ex.: Garanta sua vaga)">
-        <input id="kLink" placeholder="Link do QR code (https://...)" style="margin-top:6px">
-        <input id="kLinkTexto" placeholder="Link escrito na tela (ex.: 4blue.com.br/oferta)" style="margin-top:6px">
-        <input id="kTexto" placeholder="Texto pequeno (ex.: Aponte a câmera do celular)" style="margin-top:6px">
+        <input id="kTitulo" autocomplete="off" placeholder="Título (ex.: Garanta sua vaga)">
+        <input id="kLink" autocomplete="off" placeholder="Link do QR code (https://...)" style="margin-top:6px">
+        <input id="kLinkTexto" autocomplete="off" placeholder="Link escrito na tela (ex.: 4blue.com.br/oferta)" style="margin-top:6px">
+        <input id="kTexto" autocomplete="off" placeholder="Texto pequeno (ex.: Aponte a câmera do celular)" style="margin-top:6px">
       </div>
     </div>
 
@@ -228,17 +228,17 @@ details summary{cursor:pointer;color:var(--sub);font-size:12px;letter-spacing:.1
       <div class="secao"><div class="liga"><button class="chave" id="kLogo"></button><span>Logo no canto da tela</span></div></div>
       <div class="secao">
         <h3>Abertura</h3>
-        <input id="tSub" placeholder="Subtítulo (ex.: Aula ao vivo com Renan Kaminski)">
+        <input id="tSub" autocomplete="off" placeholder="Subtítulo (ex.: Aula ao vivo com Renan Kaminski)">
         <label class="rot">Horário de início (contagem regressiva)</label>
-        <input id="tInicio" type="time">
+        <input id="tInicio" autocomplete="off" type="time">
       </div>
       <details><summary>Textos das outras telas</summary>
-        <label class="rot">Intervalo</label><input id="tTxtInt" placeholder="Aproveite para pegar uma água. Já voltamos.">
-        <label class="rot">Voltamos já</label><input id="tTxtVolt" placeholder="Estamos ajustando a transmissão. Não saia daqui.">
+        <label class="rot">Intervalo</label><input id="tTxtInt" autocomplete="off" placeholder="Aproveite para pegar uma água. Já voltamos.">
+        <label class="rot">Voltamos já</label><input id="tTxtVolt" autocomplete="off" placeholder="Estamos ajustando a transmissão. Não saia daqui.">
         <label class="rot">Encerramento</label>
-        <input id="tFimChapeu" placeholder="Obrigado por assistir">
-        <input id="tFimTitulo" placeholder="Até a próxima" style="margin-top:6px">
-        <input id="tFimTexto" placeholder="Texto" style="margin-top:6px">
+        <input id="tFimChapeu" autocomplete="off" placeholder="Obrigado por assistir">
+        <input id="tFimTitulo" autocomplete="off" placeholder="Até a próxima" style="margin-top:6px">
+        <input id="tFimTexto" autocomplete="off" placeholder="Texto" style="margin-top:6px">
       </details>
     </div>
 
@@ -246,7 +246,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:12px;letter-spacing:.1
       <div class="secao">
         <h3>Vídeos</h3>
         <div id="listaVideos"></div>
-        <div style="display:flex;gap:6px;margin-top:6px"><input id="novoVideo" placeholder="Caminho do arquivo (ex.: F:\VIDEOS\vinheta.mp4)"><button id="bAddVideo" title="Adicionar">+</button></div>
+        <div style="display:flex;gap:6px;margin-top:6px"><input id="novoVideo" autocomplete="off" placeholder="Caminho do arquivo (ex.: F:\VIDEOS\vinheta.mp4)"><button id="bAddVideo" title="Adicionar">+</button></div>
         <p class="dica">No Windows: segure <b>Shift</b>, clique com o botão direito no vídeo e escolha <b>Copiar como caminho</b>. Quando o vídeo acaba, a live volta sozinha para o palco.</p>
       </div>
     </div>
@@ -299,11 +299,11 @@ details summary{cursor:pointer;color:var(--sub);font-size:12px;letter-spacing:.1
   <details open><summary>OBS deste computador</summary>
     <label class="rot" style="margin-top:0">Senha do WebSocket</label>
     <div style="display:flex;gap:8px"><input id="cSenha2" type="password" autocomplete="off"><button id="bReconectar">Conectar</button></div>
-    <div style="display:flex;gap:8px;margin-top:8px"><input id="cHost" placeholder="127.0.0.1"><input id="cPorta" placeholder="4455" style="max-width:100px"></div>
+    <div style="display:flex;gap:8px;margin-top:8px"><input id="cHost" autocomplete="off" placeholder="127.0.0.1"><input id="cPorta" autocomplete="off" placeholder="4455" style="max-width:100px"></div>
   </details>
   <details><summary>Sala dos convidados</summary>
     <p class="dica" style="margin-top:0">Gere uma sala nova a cada live. Os convites antigos param de funcionar.</p>
-    <div style="display:flex;gap:8px;margin-top:8px"><input id="cSala" placeholder="sala"><input id="cSenhaSala" placeholder="senha"></div>
+    <div style="display:flex;gap:8px;margin-top:8px"><input id="cSala" autocomplete="off" placeholder="sala"><input id="cSenhaSala" autocomplete="off" placeholder="senha"></div>
     <button id="bSorteio" style="margin-top:8px">Gerar sala nova</button>
   </details>
   <details><summary>Avançado</summary>
@@ -314,7 +314,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:12px;letter-spacing:.1
     <div class="liga" style="margin-top:12px"><button class="chave on" id="kMinis"></button><span>Vídeo dos convidados nos bastidores (desligue se o PC ficar lento)</span></div>
     <div class="liga" style="margin-top:8px"><button class="chave on" id="kPrevia"></button><span>Prévia do que está no ar</span></div>
     <label class="rot" id="rotPasta">Pasta do Estúdio (só quando o painel é aberto do arquivo)</label>
-    <input id="cPasta" placeholder="F:\4BLUE\ACESSO CLAUDE IA\ESTUDIO-4BLUE">
+    <input id="cPasta" autocomplete="off" placeholder="F:\4BLUE\ACESSO CLAUDE IA\ESTUDIO-4BLUE">
   </details>
   <div class="rodape"><button class="fantasma" id="bSair">Sair da conta</button><span class="esp"></span><button class="pri" data-fechar>Fechar</button></div>
 </div></div>
