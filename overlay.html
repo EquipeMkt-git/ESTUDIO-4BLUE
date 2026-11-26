@@ -8,8 +8,8 @@
 
   /* banner com nome de quem fala */
   .banner{position:absolute;left:60px;bottom:84px;display:flex;flex-direction:column;align-items:flex-start;
-    transform:translateX(-120%);transition:transform .7s cubic-bezier(.2,.8,.2,1)}
-  .banner.on{transform:none}
+    transform:translateX(calc(-100% - 90px));opacity:0;transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .4s}
+  .banner.on{transform:none;opacity:1}
   .banner .nome{background:var(--faixa);padding:14px 30px 10px;font-size:58px;border-radius:14px 14px 14px 0;
     box-shadow:0 10px 30px rgba(0,0,0,.35)}
   body.black .banner .nome{border:2px solid #C8963A}

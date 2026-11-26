@@ -53,7 +53,9 @@ function arquivoLocal(cfg,nome){return (cfg.pasta||'').replace(/\\/g,'/').replac
 const CSS_CONVIDADO='body{background:rgba(0,0,0,0)!important;margin:0;overflow:hidden}video{border-radius:28px!important;object-fit:cover!important}';
 
 function definicaoFontes(cfg){
-  const nav=(arq,extra)=>({kind:'browser_source',settings:Object.assign({is_local_file:true,local_file:arquivoLocal(cfg,arq),width:1920,height:1080,fps:30,fps_custom:false,reroute_audio:false,restart_when_active:false,shutdown:false,css:''},extra||{})});
+  // painel online: o OBS puxa as telas do site; painel aberto do arquivo: puxa da pasta local
+  const origem=arq=>cfg.site?{is_local_file:false,url:cfg.site.replace(/\/?$/,'/')+arq}:{is_local_file:true,local_file:arquivoLocal(cfg,arq)};
+  const nav=(arq,extra)=>({kind:'browser_source',settings:Object.assign(origem(arq),{width:1920,height:1080,fps:30,fps_custom:false,reroute_audio:false,restart_when_active:false,shutdown:false,css:''},extra||{})});
   const vaga=v=>({kind:'browser_source',audio:true,settings:{is_local_file:false,url:linkVisao(cfg,v),width:1280,height:720,fps:30,reroute_audio:true,restart_when_active:false,shutdown:false,css:CSS_CONVIDADO}});
   return {
     [FONTES.FUNDO]:nav('fundo.html'),
@@ -151,4 +153,63 @@ async function montarEstudio(obs,cfg,log,refazer){
     await obs.pedir('RemoveScene',{sceneName:TEMP}).catch(()=>{});
   }
   log('Pronto. '+Object.keys(CENAS).length+' cenas conferidas.');
+}
+
+/* ---------- Palco (estilo StreamYard) ----------
+   Em vez de escolher cena, o operador põe e tira pessoas do palco. O layout sai do número de pessoas
+   (1 = solo, 2 = lado a lado, 3 = grade) e da tela compartilhada (tela + pessoas na lateral, ou só a tela).
+   A cena certa é preparada (quem aparece e onde) e só depois vai ao ar. */
+const POSICOES={
+  solo:{cena:CENAS.SOLO,pessoas:[{x:160,y:90,w:1600,h:900}]},
+  dupla:{cena:CENAS.DUPLA,pessoas:[{x:27,y:250,w:920,h:518},{x:973,y:250,w:920,h:518}]},
+  trio:{cena:CENAS.TRIO,pessoas:[{x:25,y:330,w:610,h:343},{x:655,y:330,w:610,h:343},{x:1285,y:330,w:610,h:343}]},
+  telaPessoas:{cena:CENAS.TELA_MENTOR,tela:{x:30,y:100,w:1420,h:799},pessoas:[{x:1470,y:100,w:420,h:236},{x:1470,y:356,w:420,h:236},{x:1470,y:612,w:420,h:236}]},
+  soTela:{cena:CENAS.TELA_CHEIA,tela:{x:140,y:88,w:1640,h:922},pessoas:[]}
+};
+const FONTE_VAGA={c1:FONTES.C1,c2:FONTES.C2,c3:FONTES.C3};
+
+// layout: 'auto' | 'solo' | 'dupla' | 'trio' | 'telaPessoas' | 'soTela'
+function escolherLayout(palco,tela,layout){
+  const n=palco.length;
+  if(layout&&layout!=='auto'){
+    if((layout==='telaPessoas'||layout==='soTela')&&!tela) layout='auto';
+    else return layout;
+  }
+  if(tela) return n?'telaPessoas':'soTela';
+  return n>=3?'trio':n===2?'dupla':n===1?'solo':null;
+}
+
+async function arrumarPalco(obs,palco,tela,layout){
+  const nome=escolherLayout(palco,tela,layout);
+  if(!nome) return null;
+  const P=POSICOES[nome],cena=P.cena;
+  const {sceneItems}=await obs.pedir('GetSceneItemList',{sceneName:cena});
+  const ids={};sceneItems.forEach(i=>ids[i.sourceName]=i.sceneItemId);
+  const garantir=async fonte=>{
+    if(ids[fonte]==null) ids[fonte]=(await obs.pedir('CreateSceneItem',{sceneName:cena,sourceName:fonte,sceneItemEnabled:false})).sceneItemId;
+    return ids[fonte];
+  };
+  const caixa=(id,c)=>obs.pedir('SetSceneItemTransform',{sceneName:cena,sceneItemId:id,sceneItemTransform:{
+    positionX:c.x,positionY:c.y,alignment:5,boundsType:'OBS_BOUNDS_SCALE_INNER',boundsWidth:c.w,boundsHeight:c.h,boundsAlignment:0}});
+  const visiveis=palco.slice(0,P.pessoas.length);
+  for(const vaga of ['c1','c2','c3']){
+    const id=await garantir(FONTE_VAGA[vaga]);const pos=visiveis.indexOf(vaga);
+    if(pos>=0) await caixa(id,P.pessoas[pos]);
+    await obs.pedir('SetSceneItemEnabled',{sceneName:cena,sceneItemId:id,sceneItemEnabled:pos>=0});
+  }
+  if(P.tela){const id=await garantir(FONTES.TELA);await caixa(id,P.tela);await obs.pedir('SetSceneItemEnabled',{sceneName:cena,sceneItemId:id,sceneItemEnabled:true})}
+  // overlay sempre por cima de todos
+  if(ids[FONTES.OVERLAY]!=null){
+    const {sceneItems:agora}=await obs.pedir('GetSceneItemList',{sceneName:cena});
+    await obs.pedir('SetSceneItemIndex',{sceneName:cena,sceneItemId:ids[FONTES.OVERLAY],sceneItemIndex:agora.length-1});
+  }
+  await obs.pedir('SetCurrentProgramScene',{sceneName:cena});
+  return nome;
+}
+
+// Miniatura do convidado no painel (vídeo pequeno, sem som), direto do VDO.Ninja
+function linkMiniatura(cfg,vaga){
+  const p=new URLSearchParams({view:idVaga(cfg,vaga)});
+  if(cfg.senhaSala) p.set('password',cfg.senhaSala);
+  return 'https://vdo.ninja/?'+p.toString()+'&cover&cleanoutput&noaudio&scale=25&bitrate=300';
 }

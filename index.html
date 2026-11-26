@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Estúdio 4blue</title>
+<style>
+@font-face{font-family:Montserrat;font-weight:600;src:url(assets/Montserrat-SemiBold.ttf)}
+@font-face{font-family:Montserrat;font-weight:700;src:url(assets/Montserrat-Bold.ttf)}
+@font-face{font-family:Montserrat;font-weight:800;src:url(assets/Montserrat-ExtraBold.ttf)}
+:root{--bg:#0c111c;--painel:#131a29;--card:#1a2335;--card2:#202b40;--linha:#2a3650;--txt:#eef2fb;--sub:#94a1bd;
+  --azul:#0072CE;--ciano:#1998FF;--vivo:#e5383b;--ok:#22c55e;--amarelo:#F6BF00}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--txt);font:600 14px/1.4 Montserrat,system-ui,sans-serif;display:flex;flex-direction:column}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{background:#0e1524;border:1px solid var(--linha);border-radius:10px;padding:10px 12px;width:100%}
+textarea{resize:vertical;min-height:64px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--azul);border-color:transparent}
+button{cursor:pointer;border:1px solid var(--linha);background:var(--card2);border-radius:10px;padding:9px 14px;font-weight:700;transition:background .15s,border-color .15s}
+button:hover{border-color:var(--ciano)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.pri{background:var(--azul);border-color:var(--azul)}
+.pri:hover{background:#0a80e6}
+.fantasma{background:transparent;border-color:transparent;color:var(--sub)}
+.fantasma:hover{color:var(--txt);border-color:var(--linha)}
+label.rot{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px}
+.dica{color:var(--sub);font-size:12px;margin:6px 0 0;font-weight:600}
+
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--linha);background:#0a0f19}
+header img{height:24px}
+#titulo{max-width:380px;background:transparent;border-color:transparent;font-weight:800;font-size:15px}
+#titulo:hover{border-color:var(--linha)}
+.esp{flex:1}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:99px;background:var(--card);font-size:12px;cursor:default;white-space:nowrap}
+.pill i{width:8px;height:8px;border-radius:50%;background:#64748b}
+.pill.ok i{background:var(--ok)}.pill.erro i{background:var(--vivo)}
+#stats{font-size:12px;color:var(--sub);white-space:nowrap}
+#usuario{font-size:12px;color:var(--sub)}
+#bVivo{background:var(--vivo);border-color:var(--vivo);padding:10px 18px}
+#bVivo.no-ar{background:#3a1216;border-color:var(--vivo);color:#ffc9cb}
+#bGravar.on{background:#7c2d12;border-color:#ea580c}
+
+.app{flex:1;display:grid;grid-template-columns:1fr 390px;min-height:0}
+@media(max-width:1100px){.app{grid-template-columns:1fr}}
+.centro{padding:16px 20px;overflow:auto;display:flex;flex-direction:column;gap:14px;min-width:0}
+aside{border-left:1px solid var(--linha);background:var(--painel);display:flex;flex-direction:column;min-height:0}
+
+.palco{position:relative;max-width:1040px;width:100%;margin:0 auto;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.4);flex:none}
+.palco img{width:100%;height:100%;object-fit:contain;display:block}
+.palco .vazio{position:absolute;inset:0;display:grid;place-items:center;color:var(--sub);text-align:center;padding:20px}
+.palco .tag{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.65);color:#fff;font-size:11px;font-weight:800;letter-spacing:.12em;padding:4px 10px;border-radius:6px}
+.palco .tag.vivo{background:var(--vivo)}
+
+.barra{max-width:1040px;width:100%;margin:0 auto;display:flex;gap:8px;flex-wrap:wrap;align-items:stretch;justify-content:center}
+.barra .grupo{display:flex;gap:4px;background:var(--painel);padding:6px;border-radius:12px;border:1px solid var(--linha);align-items:stretch}
+.lay{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:7px 8px;min-width:70px;font-size:11px;background:transparent;border-color:transparent}
+.lay svg{width:34px;height:20px}
+.lay svg rect{fill:#6d7d9e}
+.lay.sel{background:var(--azul);border-color:var(--azul)}
+.lay.sel svg rect{fill:#fff}
+.tela-b{font-size:12px;padding:9px 12px;background:transparent;border-color:transparent}
+.tela-b.sel{background:var(--vivo);border-color:var(--vivo)}
+#bVoltarPalco{background:var(--ok);border-color:var(--ok);color:#052e14}
+
+.bast{max-width:1040px;width:100%;margin:0 auto}
+.bast-topo{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.bast-topo h2{margin:0;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--sub)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
+.pc{background:var(--card);border:2px solid var(--linha);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.pc.no-palco{border-color:var(--vivo)}
+.pc .mini{position:relative;aspect-ratio:16/9;background:#070b13;display:grid;place-items:center;color:#4b5875;font-size:12px;text-align:center;padding:6px}
+.pc .mini iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}
+.pc .mini .selo{position:absolute;top:8px;left:8px;background:var(--vivo);font-size:10px;font-weight:800;letter-spacing:.1em;padding:3px 8px;border-radius:5px;z-index:1;color:#fff}
+.pc .info{padding:10px;display:flex;flex-direction:column;gap:8px}
+.pc .nome{display:flex;align-items:center;gap:6px;min-height:22px}
+.pc .nome b{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc .nome b.sem{color:var(--sub);font-weight:600}
+.pc .med{height:4px;background:#0e1524;border-radius:2px;overflow:hidden}
+.pc .med i{display:block;height:100%;width:0;background:var(--ok);transition:width .08s}
+.pc .acoes{display:flex;gap:6px}
+.pc .acoes .grande{flex:1;padding:9px 8px}
+.pc.no-palco .acoes .grande{background:#3a1216;border-color:var(--vivo);color:#ffc9cb}
+.ic{padding:8px 10px;min-width:38px}
+.ic.mudo{background:#3a1216;border-color:var(--vivo)}
+
+.abas{display:flex;border-bottom:1px solid var(--linha)}
+.abas button{flex:1;border:0;border-radius:0;background:transparent;padding:14px 6px;color:var(--sub);font-size:12px;border-bottom:2px solid transparent}
+.abas button.sel{color:var(--txt);border-bottom-color:var(--ciano)}
+.aba{display:none;padding:16px;overflow:auto;flex:1}
+.aba.sel{display:block}
+.secao{margin-bottom:22px}
+.secao h3{margin:0 0 10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--sub);display:flex;align-items:center;gap:8px}
+.secao h3 .esp{flex:1}
+.item{background:var(--card);border:1px solid var(--linha);border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;gap:10px;align-items:center}
+.item:hover{border-color:var(--ciano)}
+.item.on{border-color:var(--amarelo);background:#2a2410}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .t small{color:var(--sub);display:block;overflow:hidden;text-overflow:ellipsis}
+.item .t p{margin:2px 0 0;font-weight:600;word-break:break-word}
+.item .x{background:transparent;border:0;color:var(--sub);padding:4px 6px}
+.item .x:hover{color:var(--vivo)}
+.item img{width:32px;height:32px;border-radius:50%;object-fit:cover;flex:none;align-self:flex-start}
+.liga{display:flex;align-items:center;gap:10px}
+.chave{position:relative;width:42px;height:24px;border-radius:99px;background:#334160;border:0;padding:0;flex:none}
+.chave::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s}
+.chave.on{background:var(--ok)}
+.chave.on::after{left:21px}
+.temas{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tema{height:64px;border-radius:12px;border:2px solid var(--linha);display:flex;align-items:flex-end;padding:8px;font-size:12px}
+.tema.sel{border-color:var(--ciano);box-shadow:0 0 0 2px var(--ciano)}
+.tema[data-t=azul]{background:linear-gradient(135deg,#004882,#0072CE)}
+.tema[data-t=black]{background:linear-gradient(135deg,#000,#2a2110);color:#E8C26A}
+.chat{display:flex;flex-direction:column;gap:6px}
+.vazio-txt{color:var(--sub);font-size:13px;padding:8px 0;line-height:1.5}
+
+.fundo-modal{position:fixed;inset:0;background:rgba(3,6,12,.78);display:grid;place-items:center;z-index:20;padding:20px}
+.modal{background:var(--painel);border:1px solid var(--linha);border-radius:18px;width:min(560px,100%);max-height:90vh;overflow:auto;padding:24px}
+.modal h2{margin:0 0 6px;font-size:20px}
+.modal .sub{color:var(--sub);margin:0 0 16px}
+.modal .rodape{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.passos{margin:0 0 14px;padding-left:20px;color:var(--sub)}
+.passos li{margin-bottom:6px}
+.passos b{color:var(--txt)}
+.conv{background:var(--card);border:1px solid var(--linha);border-radius:12px;padding:12px;margin-bottom:10px}
+.conv .linha{display:flex;gap:8px;align-items:center}
+.conv .linha b{width:96px;flex:none;font-size:12px;color:var(--sub)}
+details summary{cursor:pointer;color:var(--sub);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin:16px 0 8px}
+.log{background:#070b13;border-radius:10px;padding:10px;font:12px/1.5 Consolas,monospace;max-height:150px;overflow:auto;color:#9fb3d9;white-space:pre-wrap;margin-top:10px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111a2c;border:1px solid var(--ciano);padding:11px 18px;border-radius:12px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;max-width:90vw}
+.toast.on{opacity:1}
+.pop{position:fixed;background:var(--painel);border:1px solid var(--linha);border-radius:12px;padding:8px;display:flex;gap:6px;z-index:10;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.login{text-align:center}
+.login img{height:40px;margin:6px 0 14px}
+#gBotao{display:flex;justify-content:center;margin:18px 0 6px;min-height:44px}
+</style></head>
+<body>
+<header>
+  <img src="assets/logo-4blue-branca.png" alt="4blue">
+  <input id="titulo" placeholder="Nome da live (aparece na abertura)">
+  <span class="esp"></span>
+  <span id="stats"></span>
+  <span class="pill" id="pObs" title="Conexão com o OBS"><i></i><span>OBS</span></span>
+  <span id="usuario"></span>
+  <button class="fantasma" id="bConfig" title="Configurações">⚙ Configurações</button>
+  <button id="bGravar" disabled>● Gravar</button>
+  <button id="bVivo" disabled>Entrar ao vivo</button>
+</header>
+
+<div class="app">
+  <section class="centro">
+    <div class="palco" id="palco"><div class="vazio" id="palcoVazio">Conecte o OBS para ver o que está indo ao ar</div></div>
+
+    <div class="barra">
+      <div class="grupo" id="layouts" title="Como as pessoas aparecem na tela"></div>
+      <div class="grupo" id="telas">
+        <button class="tela-b" id="bVoltarPalco" hidden>◀ Voltar ao palco</button>
+        <button class="tela-b" data-tela="ABERTURA">Abertura</button>
+        <button class="tela-b" data-tela="INTERVALO">Intervalo</button>
+        <button class="tela-b" data-tela="VOLTAMOS">Voltamos já</button>
+        <button class="tela-b" data-tela="ENCERRAMENTO">Encerramento</button>
+      </div>
+    </div>
+
+    <div class="bast">
+      <div class="bast-topo">
+        <h2>Bastidores</h2>
+        <span class="dica" style="margin:0">Quem entra pelo convite aparece aqui. <b>Pôr no palco</b> coloca no ar.</span>
+        <span class="esp"></span>
+        <button class="fantasma" id="bFalar" title="Abre a sala para conversar com os convidados antes de entrarem">🎧 Falar com convidados</button>
+        <button class="pri" id="bConvidar">+ Convidar</button>
+      </div>
+      <div class="cards" id="cards"></div>
+    </div>
+  </section>
+
+  <aside>
+    <div class="abas" id="abas">
+      <button data-aba="aComent" class="sel">Comentários</button>
+      <button data-aba="aBanner">Banners</button>
+      <button data-aba="aMarca">Marca</button>
+      <button data-aba="aMidia">Vídeos</button>
+    </div>
+
+    <div class="aba sel" id="aComent">
+      <div id="chatConfig">
+        <label class="rot" style="margin-top:0">Link da live no YouTube</label>
+        <div style="display:flex;gap:8px"><input id="chatLink" placeholder="Cole o link da live"><button class="pri" id="bChat">Ligar</button></div>
+        <p class="dica" id="chatStatus"></p>
+      </div>
+      <div class="secao" style="margin-top:14px">
+        <h3>Comentários <span class="esp"></span><button class="fantasma" id="bTirarComent" style="padding:4px 8px;font-size:11px">Tirar da tela</button></h3>
+        <div class="chat" id="chat"></div>
+      </div>
+      <details><summary>Escrever um comentário</summary>
+        <input id="mNome" placeholder="Nome">
+        <textarea id="mTexto" placeholder="Comentário" style="margin-top:6px"></textarea>
+        <button id="bManual" style="margin-top:6px">Mostrar na live</button>
+      </details>
+    </div>
+
+    <div class="aba" id="aBanner">
+      <div class="secao">
+        <h3>Nome na tela <span class="esp"></span><button class="fantasma" id="bTirarBanner" style="padding:4px 8px;font-size:11px">Tirar</button></h3>
+        <div id="listaBanners"></div>
+        <div style="display:flex;gap:6px;margin-top:6px"><input id="nbTitulo" placeholder="Nome ou título"><input id="nbSub" placeholder="Cargo (opcional)"><button id="bAddBanner" title="Adicionar">+</button></div>
+        <p class="dica">Clique para mostrar. Clique de novo para tirar.</p>
+      </div>
+      <div class="secao">
+        <h3>Letreiro <span class="esp"></span><button class="chave" id="kLetreiro" title="Mostrar letreiro"></button></h3>
+        <textarea id="lTexto" placeholder="Texto que corre na parte de baixo da tela" rows="2"></textarea>
+      </div>
+      <div class="secao">
+        <h3>Chamada com QR code <span class="esp"></span><button class="chave" id="kCta" title="Mostrar chamada"></button></h3>
+        <input id="kTitulo" placeholder="Título (ex.: Garanta sua vaga)">
+        <input id="kLink" placeholder="Link do QR code (https://...)" style="margin-top:6px">
+        <input id="kLinkTexto" placeholder="Link escrito na tela (ex.: 4blue.com.br/oferta)" style="margin-top:6px">
+        <input id="kTexto" placeholder="Texto pequeno (ex.: Aponte a câmera do celular)" style="margin-top:6px">
+      </div>
+    </div>
+
+    <div class="aba" id="aMarca">
+      <div class="secao">
+        <h3>Tema</h3>
+        <div class="temas"><button class="tema" data-t="azul">4blue</button><button class="tema" data-t="black">Black Friday</button></div>
+      </div>
+      <div class="secao"><div class="liga"><button class="chave" id="kLogo"></button><span>Logo no canto da tela</span></div></div>
+      <div class="secao">
+        <h3>Abertura</h3>
+        <input id="tSub" placeholder="Subtítulo (ex.: Aula ao vivo com Renan Kaminski)">
+        <label class="rot">Horário de início (contagem regressiva)</label>
+        <input id="tInicio" type="time">
+      </div>
+      <details><summary>Textos das outras telas</summary>
+        <label class="rot">Intervalo</label><input id="tTxtInt" placeholder="Aproveite para pegar uma água. Já voltamos.">
+        <label class="rot">Voltamos já</label><input id="tTxtVolt" placeholder="Estamos ajustando a transmissão. Não saia daqui.">
+        <label class="rot">Encerramento</label>
+        <input id="tFimChapeu" placeholder="Obrigado por assistir">
+        <input id="tFimTitulo" placeholder="Até a próxima" style="margin-top:6px">
+        <input id="tFimTexto" placeholder="Texto" style="margin-top:6px">
+      </details>
+    </div>
+
+    <div class="aba" id="aMidia">
+      <div class="secao">
+        <h3>Vídeos</h3>
+        <div id="listaVideos"></div>
+        <div style="display:flex;gap:6px;margin-top:6px"><input id="novoVideo" placeholder="Caminho do arquivo (ex.: F:\VIDEOS\vinheta.mp4)"><button id="bAddVideo" title="Adicionar">+</button></div>
+        <p class="dica">No Windows: segure <b>Shift</b>, clique com o botão direito no vídeo e escolha <b>Copiar como caminho</b>. Quando o vídeo acaba, a live volta sozinha para o palco.</p>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Login -->
+<div class="fundo-modal" id="mLogin" hidden><div class="modal login">
+  <img src="assets/logo-4blue-branca.png" alt="4blue">
+  <h2>Estúdio de lives</h2>
+  <p class="sub">Entre com a sua conta Google da 4blue.</p>
+  <div id="gBotao"></div>
+  <p class="dica" id="loginErro" style="color:#fca5a5"></p>
+</div></div>
+
+<!-- Conectar ao OBS -->
+<div class="fundo-modal" id="mConectar" hidden><div class="modal">
+  <h2>Conectar ao OBS deste computador</h2>
+  <p class="sub">Só na primeira vez em cada computador. Depois o painel conecta sozinho.</p>
+  <ol class="passos">
+    <li>Abra o <b>OBS</b> neste computador.</li>
+    <li>No OBS: <b>Ferramentas → Configurações do servidor WebSocket</b> e marque <b>Habilitar</b>.</li>
+    <li>Clique em <b>Mostrar informações de conexão</b>, copie a <b>senha</b> e cole aqui.</li>
+  </ol>
+  <label class="rot">Senha do OBS</label>
+  <input id="cSenha" type="password" autocomplete="off" placeholder="cole a senha aqui">
+  <p class="dica" id="conectarErro" style="color:#fca5a5"></p>
+  <div class="rodape"><button class="fantasma" data-fechar>Depois</button><button class="pri" id="bConectar">Conectar</button></div>
+</div></div>
+
+<!-- Preparar o OBS -->
+<div class="fundo-modal" id="mPreparar" hidden><div class="modal">
+  <h2>Preparar o OBS</h2>
+  <p class="sub" id="prepTexto">Vou criar as cenas, as telas e os filtros de som dentro do OBS. Leva uns segundos.</p>
+  <div class="log" id="log" hidden></div>
+  <div class="rodape"><button class="fantasma" id="bPrepDepois">Agora não</button><button class="pri" id="bPreparar">Preparar automaticamente</button></div>
+</div></div>
+
+<!-- Convidar -->
+<div class="fundo-modal" id="mConvidar" hidden><div class="modal">
+  <h2>Convidar pessoas</h2>
+  <p class="sub">Escreva o nome e copie o convite. A mensagem já vai com o link de entrada e o teste de câmera: é só colar no WhatsApp.</p>
+  <div id="listaConv"></div>
+  <div class="rodape"><button class="pri" data-fechar>Pronto</button></div>
+</div></div>
+
+<!-- Configurações -->
+<div class="fundo-modal" id="mConfig" hidden><div class="modal">
+  <h2>Configurações</h2>
+  <details open><summary>OBS deste computador</summary>
+    <label class="rot" style="margin-top:0">Senha do WebSocket</label>
+    <div style="display:flex;gap:8px"><input id="cSenha2" type="password" autocomplete="off"><button id="bReconectar">Conectar</button></div>
+    <div style="display:flex;gap:8px;margin-top:8px"><input id="cHost" placeholder="127.0.0.1"><input id="cPorta" placeholder="4455" style="max-width:100px"></div>
+  </details>
+  <details><summary>Sala dos convidados</summary>
+    <p class="dica" style="margin-top:0">Gere uma sala nova a cada live. Os convites antigos param de funcionar.</p>
+    <div style="display:flex;gap:8px;margin-top:8px"><input id="cSala" placeholder="sala"><input id="cSenhaSala" placeholder="senha"></div>
+    <button id="bSorteio" style="margin-top:8px">Gerar sala nova</button>
+  </details>
+  <details><summary>Avançado</summary>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button id="bRefazer" disabled>Refazer cenas do zero</button>
+      <button id="bLinks">Copiar link da sala dos bastidores</button>
+    </div>
+    <div class="liga" style="margin-top:12px"><button class="chave on" id="kMinis"></button><span>Vídeo dos convidados nos bastidores (desligue se o PC ficar lento)</span></div>
+    <div class="liga" style="margin-top:8px"><button class="chave on" id="kPrevia"></button><span>Prévia do que está no ar</span></div>
+    <label class="rot" id="rotPasta">Pasta do Estúdio (só quando o painel é aberto do arquivo)</label>
+    <input id="cPasta" placeholder="F:\4BLUE\ACESSO CLAUDE IA\ESTUDIO-4BLUE">
+  </details>
+  <div class="rodape"><button class="fantasma" id="bSair">Sair da conta</button><span class="esp"></span><button class="pri" data-fechar>Fechar</button></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+<script src="config.js"></script>
+<script src="obs.js"></script>
+<script src="montar.js"></script>
+<script src="painel.js"></script>
+</body></html>

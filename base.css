@@ -1,5 +1,5 @@
 /* Estúdio 4blue — fontes e cores da ID (empresa = azul, campanha Black = preto/dourado) */
-@font-face{font-family:KO;src:url(assets/knockout-50.otf)}
+@font-face{font-family:KO;src:local("Knockout 50 Welterweight"),local("Knockout-50Welterweight"),url(assets/knockout-50.otf)}
 @font-face{font-family:Montserrat;font-weight:600;src:url(assets/Montserrat-SemiBold.ttf)}
 @font-face{font-family:Montserrat;font-weight:700;src:url(assets/Montserrat-Bold.ttf)}
 @font-face{font-family:Montserrat;font-weight:800;src:url(assets/Montserrat-ExtraBold.ttf)}

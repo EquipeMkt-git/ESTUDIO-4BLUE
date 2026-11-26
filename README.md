@@ -1,124 +1,45 @@
 # Estúdio 4blue: o substituto do StreamYard
 
-O sistema junta três peças gratuitas:
-- O **OBS** transmite para o YouTube.
-- O **VDO.Ninja** traz os mentores e convidados por um link no navegador.
-- O **painel** (`painel.html`) é por onde você controla tudo durante a live, sem mexer no OBS.
+**Painel:** https://equipemkt-git.github.io/ESTUDIO-4BLUE/ (entra com a conta Google da 4blue)
+**Teste do mentor:** https://equipemkt-git.github.io/ESTUDIO-4BLUE/teste-mentor.html
 
-O painel roda neste computador e conversa com o OBS pelo WebSocket, que já vem dentro do OBS. Ele não usa servidor nem tem mensalidade.
+O painel fica online, mas comanda o **OBS do computador onde ele está aberto**. Abra o painel no mesmo PC que vai transmitir.
 
-**Teste do mentor (link para mandar aos convidados):** https://equipemkt-git.github.io/ESTUDIO-4BLUE/teste-mentor.html
+## Primeira vez em cada PC (5 minutos)
+1. No OBS, vá em **Ferramentas → Configurações do servidor WebSocket**, marque **Habilitar** e copie a senha em **Mostrar informações de conexão**.
+2. Em **Configurações → Transmissão**, conecte a conta do YouTube (ou cole a chave). Em **Saída**, use 6000 kbps e o codificador da placa de vídeo (AMD/NVIDIA), se houver.
+3. Abra o painel, entre com o Google da 4blue e cole a senha do OBS.
+4. O painel prepara o OBS sozinho: cria as cenas, as telas na ID e os filtros de som. Basta clicar em **Preparar automaticamente**.
 
-**Fonte Knockout:** é paga e não fica neste repositório público. Para os títulos ficarem na ID, copie `knockout-50.otf` de `F:\4BLUE\ACESSO CLAUDE IA\LIVE-WORKSHOP-PRECIFICACAO\assets` para a pasta `assets/` depois de baixar. Sem ela, as telas usam uma fonte comum.
+## Em cada live
+1. **+ Convidar:** escreva o nome de cada pessoa e clique em **Copiar convite**. A mensagem já vai pronta para o WhatsApp, com o link de entrada e o teste de câmera.
+2. Escreva o **nome da live** no topo. Em **Marca**, coloque o horário de início, que alimenta a contagem da Abertura.
+3. Deixe a **Abertura** no ar e clique em **Entrar ao vivo**.
+4. Quem entra aparece nos **Bastidores**. Clique em **Pôr no palco** para colocar a pessoa no ar.
+   - O layout se ajusta sozinho: 1 pessoa ocupa a tela, 2 ficam lado a lado, 3 ficam em linha.
+   - Com a **tela compartilhada** no palco, a tela fica grande e as pessoas vão para a lateral.
+   - Para fixar um formato, use os botões de layout embaixo da prévia.
+5. O botão **🏷** de cada pessoa mostra o nome dela na tela. Na aba **Banners** ficam outros nomes, o **letreiro** e a **chamada com QR code**.
+6. Os botões **Intervalo** (com relógio), **Voltamos já** e **Encerramento** trocam a tela. **Voltar ao palco** retoma as pessoas.
+7. Em **Vídeos**, cole o caminho do arquivo e clique em ▶. Quando o vídeo acaba, a live volta sozinha ao palco.
+8. Em **Comentários**, cole o link da live e clique em **Ligar**. Um clique no comentário mostra ele na tela.
+9. **🎧 Falar com convidados** abre a sala para conversar com quem está nos bastidores antes de entrar no ar. Use fone.
 
-**Como usar no PC da live:** baixe o repositório (Code → Download ZIP), extraia e abra o `painel.html` com duplo clique. Não abra o painel pelo endereço do GitHub Pages: ele precisa rodar no mesmo PC do OBS.
+## Bom saber
+- **Gerar sala nova** (em Configurações) a cada live: os convites antigos param de funcionar.
+- O topo mostra o uso do processador. Se ficar vermelho, desligue em Configurações o "vídeo dos convidados nos bastidores".
+- Com 8 GB de RAM, use no máximo 3 pessoas + 1 tela. Use cabo de rede: se a internet do PC cair, a live cai.
+- A fonte **Knockout** é paga e não fica no repositório. As telas usam a Knockout instalada no PC. Se o PC não tiver a fonte, entra uma fonte comum.
 
-## O que tem na pasta
-
-| Arquivo | Para que serve |
+## Arquivos
+| Arquivo | O que é |
 |---|---|
-| `painel.html` | **Abra este.** Cenas, convidados, banner, letreiro, QR, comentários, vídeo, transmissão |
-| `overlay.html` | Camada por cima da live: logo, banner com nome, letreiro, comentário em destaque, chamada com QR |
-| `fundo.html`, `abertura.html`, `intervalo.html`, `voltamos.html`, `encerramento.html` | Telas cheias na ID (tema azul da 4blue ou tema da Black) |
-| `teste-mentor.html` | Página para o mentor testar câmera, microfone, fone e internet na véspera |
-| `obs.js`, `montar.js`, `painel.js`, `tela.js`, `estado.js`, `base.css`, `assets/` | Peças internas, não precisa abrir |
+| `index.html`, `painel.js` | O painel |
+| `overlay.html`, `fundo.html`, `abertura.html`, `intervalo.html`, `voltamos.html`, `encerramento.html` | O que o OBS mostra (o OBS carrega do site) |
+| `teste-mentor.html` | Teste de câmera, som e internet para o convidado |
+| `montar.js` | Cria as cenas no OBS e monta o palco |
+| `obs.js` | Conversa com o OBS |
+| `config.js` | Login, domínio e endereço do Apps Script |
+| `comentarios.gs` | Apps Script: confere o login e lê os comentários do YouTube |
 
-## Instalação (uma vez só, no PC que vai transmitir)
-
-### 1. Ligar o WebSocket do OBS
-1. No OBS, vá em **Ferramentas → Configurações do servidor WebSocket**.
-2. Marque **Habilitar servidor WebSocket**. A porta fica 4455 e a autenticação fica ligada.
-3. Clique em **Mostrar informações de conexão** e copie a **senha**.
-4. **Nunca** abra a porta 4455 no roteador. O painel só funciona no próprio PC, e é assim que deve ser.
-
-### 2. Ajustar a transmissão para o YouTube
-- **Configurações → Transmissão:** serviço YouTube - RTMPS. Use **Conectar conta** ou cole a chave de transmissão do YouTube Studio. A chave fica só no OBS e nunca passa pelo painel.
-- **Configurações → Saída** (modo Simples):
-  - taxa de bits do vídeo: **6000 kbps**;
-  - codificador: **hardware AMD (AMF) H.264**, se aparecer. Ele alivia o processador. Se não aparecer, use x264 em "veryfast";
-  - áudio: **160 kbps**.
-- **Configurações → Avançado → Reconectar automaticamente:** ligado, 10 tentativas e 5 segundos de espera. Se a internet piscar, o OBS volta sozinho.
-- **Configurações → Áudio:** 48 kHz.
-
-### 3. Montar as cenas pelo painel
-1. Abra o `painel.html` com **duplo clique** (no Chrome ou no Edge).
-2. Vá em **Configurar**, cole a senha do WebSocket e clique em **Conectar**. A opção "Lembrar a senha" evita digitar de novo.
-3. Clique em **1. Ajustar vídeo 1080p30**. Faça isso **antes** de montar, porque as posições das cenas dependem da resolução.
-4. Clique em **2. Montar / atualizar estúdio**. Ele cria as 10 cenas, as fontes dos convidados, as telas e os filtros de áudio: tira ruído, nivela a voz e impede o som de estourar.
-5. Para refazer as cenas depois, use **Refazer cenas do zero**.
-
-As cenas são Abertura, Solo, Dupla, Trio, Tela + mentor, Tela cheia, Vídeo, Intervalo, Voltamos já e Encerramento. Os nomes começam com número para ficarem em ordem no OBS.
-
-### 4. Comentários na tela (Social Stream Ninja)
-1. No Chrome, instale a extensão gratuita **Social Stream Ninja** pela Chrome Web Store.
-2. Nas configurações da extensão, ligue a opção de **enviar mensagens ao servidor de API**. Ela fica em Configurações globais → Mecânicas.
-3. Copie o **ID da sessão** que a extensão mostra e cole em **Configurar → Comentários** no painel. Depois clique em **Ligar**.
-4. Na hora da live, abra o **chat pop-out** da live no YouTube (menu ⋮ do chat → "Abrir chat em pop-up"). A extensão lê os comentários de lá. Ela também lê Instagram e TikTok se a live for para lá.
-5. Os comentários aparecem na aba **Comentários** do painel. Um clique mostra o comentário na live, outro clique tira. Se a extensão falhar, use o **comentário manual**.
-
-### 5. Plugins opcionais do OBS (gratuitos)
-- **Move Transition** (do exeldro): as câmeras deslizam quando o layout muda, em vez de cortar seco. Depois de instalar, escolha a transição "Move" no OBS.
-- **Aitum Multistream**: transmite para YouTube, Instagram e TikTok ao mesmo tempo. É o mesmo esquema que a Live 24h usa com o obs-multi-rtmp.
-
-Os dois estão no site do OBS, em obsproject.com → Forums → Resources. Instale fechando o OBS antes.
-
-## Antes de cada live
-
-**Na véspera**
-- Em **Configurar**, clique em **Gerar sala e senha novas**. Depois clique em **Montar / atualizar estúdio** para o OBS pegar os links novos.
-- Preencha o nome de cada convidado no painel e use **Copiar link** em cada vaga. Mande para cada pessoa só o link dela.
-- O convidado que vai mostrar slides recebe também o link da **TELA**, para abrir em outra aba e compartilhar a tela.
-- Mande também o link do teste: https://equipemkt-git.github.io/ESTUDIO-4BLUE/teste-mentor.html (também aparece em Configurar → Links).
-- Na aba **Telas**, preencha o título da aula e o horário de início (a contagem da abertura usa esse horário).
-- Na aba **Banner**, deixe prontos o letreiro e a chamada com QR.
-
-**30 minutos antes**
-- Abra o OBS e depois o painel. Ele reconecta sozinho se a senha estiver salva.
-- Deixe a cena **Abertura** no ar.
-- Clique em **Abrir bastidores** para ver quem já entrou, falar com cada pessoa e conferir o som.
-- Ligue os comentários e abra o chat pop-out do YouTube.
-- Clique em **Iniciar transmissão**. A contagem regressiva segura o público até a hora.
-
-**Durante**
-- Para trocar de cena, use os botões ou as teclas **1 a 0**:
-
-  | Tecla | Cena |
-  |---|---|
-  | 1 | Abertura |
-  | 2 | Solo |
-  | 3 | Dupla |
-  | 4 | Trio |
-  | 5 | Tela + mentor |
-  | 6 | Tela cheia |
-  | 7 | Vídeo |
-  | 8 | Intervalo |
-  | 9 | Voltamos já |
-  | 0 | Encerramento |
-
-- Para escolher quem aparece em **Solo** ou **Tela + mentor**, use os botões **Solo** e **Com a tela** do convidado.
-- O botão **Banner** do convidado põe o nome e o cargo dele na tela.
-- O botão **Som** de cada convidado corta o áudio dele na live. A barrinha verde mostra se está chegando som.
-- Para vídeo, cole o caminho do arquivo na lista e clique em **Tocar no ar**. Quando o vídeo termina, o painel volta sozinho para a cena anterior.
-- Para intervalo, clique em **5, 10 ou 15 min**. A tela entra no ar já com a contagem.
-- Se algo der errado, aperte **9 (Voltamos já)**.
-
-**No fim**
-- Coloque a cena **Encerramento** no ar e depois clique em **Encerrar transmissão** (o painel pede confirmação).
-
-## Gravação separada de cada convidado (para cortes)
-- Nos **bastidores** (sala do diretor do VDO.Ninja), cada convidado tem um botão de **gravar**. O arquivo fica salvo neste PC em qualidade melhor que a live, o que é bom para cortar Reels depois.
-- O botão **● Gravar** do painel grava a live inteira como ela sai, na pasta de gravação do OBS.
-
-## Limites deste PC
-- Com 8 GB de RAM, o recomendado é até **3 convidados + 1 tela**. Feche o navegador pesado, o WhatsApp Desktop e o Canva durante a live.
-- No topo do painel aparecem o uso do processador (CPU) e a perda de quadros. Se a CPU passar de 80% ou a "perda" passar de 1%, desligue a **prévia** do painel e baixe a taxa do vídeo para 4500 kbps.
-- Quem transmite é este PC e esta internet. Se o PC ou a internet caírem, a live cai, diferente do StreamYard, que roda na nuvem. Use cabo de rede.
-
-## Segurança
-- A senha do WebSocket fica só neste computador.
-- Gere uma sala nova a cada live. Quem tem o link do convidado entra nos bastidores.
-- As chaves do YouTube ficam só no OBS.
-
-## Repositório e pendências
-- Código no GitHub: https://github.com/EquipeMkt-git/ESTUDIO-4BLUE (público, sem a fonte Knockout). Para mudar algo, altere aqui na pasta e suba de novo.
-- **Teste com convidado real:** as cenas, telas, overlay, vídeo, banner, letreiro, QR e comentário manual foram testados num OBS isolado. A entrada de um convidado de verdade pelo VDO.Ninja e o chat do Social Stream ainda não, porque precisam de câmera e de uma live real. Faça uma live de teste não listada antes da primeira aula.
+Código: https://github.com/EquipeMkt-git/ESTUDIO-4BLUE
