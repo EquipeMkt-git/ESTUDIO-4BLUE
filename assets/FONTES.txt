@@ -1,0 +1,1 @@
+Montserrat: licenca livre (SIL OFL), esta aqui. Knockout: fonte paga, nao fica neste repositorio publico. Copie knockout-50.otf para esta pasta no PC da live.
