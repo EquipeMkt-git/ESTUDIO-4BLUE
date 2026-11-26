@@ -5,7 +5,7 @@ window.ESTUDIO_CONFIG={
   // Só entra quem tem e-mail deste domínio.
   DOMINIO:'4blue.com.br',
   // Apps Script "ESTUDIO 4BLUE" (login + comentários do YouTube). URL /exec da implantação.
-  API_URL:'',
+  API_URL:'https://script.google.com/macros/s/AKfycbzsagO8ncb6KkLMIZ22VLI3hgEjcCuOyqWLYdhxnZScF2SdIKmwWmkXBxbO-x33etea/exec',
   // Endereço publicado (o OBS puxa as telas e o overlay daqui).
   SITE:'https://equipemkt-git.github.io/ESTUDIO-4BLUE/',
   TESTE_MENTOR:'https://equipemkt-git.github.io/ESTUDIO-4BLUE/teste-mentor.html'
