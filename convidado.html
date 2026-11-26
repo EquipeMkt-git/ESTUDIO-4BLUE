@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live 4blue — convidado</title>
+<style>
+@font-face{font-family:Montserrat;font-weight:600;src:url(assets/Montserrat-SemiBold.ttf)}
+@font-face{font-family:Montserrat;font-weight:700;src:url(assets/Montserrat-Bold.ttf)}
+@font-face{font-family:Montserrat;font-weight:800;src:url(assets/Montserrat-ExtraBold.ttf)}
+:root{--bg:#0c111c;--painel:#131a29;--card:#1a2335;--linha:#2a3650;--txt:#eef2fb;--sub:#94a1bd;--azul:#0072CE;--ciano:#1998FF;--amarelo:#F6BF00}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--txt);font:600 14px/1.45 Montserrat,system-ui,sans-serif;display:flex;flex-direction:column}
+button,input,textarea{font:inherit;color:inherit}
+input,textarea{background:#0e1524;border:1px solid var(--linha);border-radius:10px;padding:11px 12px;width:100%}
+input:focus,textarea:focus{outline:2px solid var(--azul);border-color:transparent}
+button{cursor:pointer;border:1px solid var(--linha);background:#202b40;border-radius:10px;padding:10px 16px;font-weight:700}
+.pri{background:var(--azul);border-color:var(--azul)}
+a{color:var(--ciano)}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--linha);background:#0a0f19}
+header img{height:24px}
+header .t{flex:1;min-width:0}
+header b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header small{color:var(--sub)}
+.app{flex:1;display:grid;grid-template-columns:1fr 340px;min-height:0}
+@media(max-width:900px){.app{grid-template-columns:1fr;grid-template-rows:1fr 320px}}
+.cam{position:relative;background:#000;min-height:0}
+.cam iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.entrada{position:absolute;inset:0;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 30% 20%,#13305a,#0c111c 60%)}
+.entrada .caixa{width:min(460px,100%);background:var(--painel);border:1px solid var(--linha);border-radius:18px;padding:26px}
+.entrada h1{margin:0 0 6px;font-size:22px}
+.entrada p{color:var(--sub);margin:0 0 14px}
+.entrada ul{color:var(--sub);padding-left:18px;margin:14px 0}
+.entrada li{margin-bottom:5px}
+.entrada li b{color:var(--txt)}
+aside{border-left:1px solid var(--linha);background:var(--painel);display:flex;flex-direction:column;min-height:0}
+aside h2{margin:0;padding:14px 16px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--sub);border-bottom:1px solid var(--linha)}
+.msgs{flex:1;overflow:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.m{max-width:88%;padding:8px 11px;border-radius:12px;background:#1a2335;align-self:flex-start;word-break:break-word}
+.m small{display:block;color:var(--sub);font-size:11px;margin-bottom:2px}
+.m.prod{background:#13305a;border:1px solid #1d4b8a}
+.m.eu{align-self:flex-end;background:#0f3d22;border:1px solid #1f6b3c}
+.vazio{color:var(--sub);font-size:13px;text-align:center;margin:auto}
+form{display:flex;gap:8px;padding:12px;border-top:1px solid var(--linha)}
+.erro{color:#fca5a5}
+</style></head>
+<body>
+<header>
+  <img src="assets/logo-4blue-branca.png" alt="4blue">
+  <div class="t"><b id="titulo">Carregando…</b><small id="subt"></small></div>
+  <a href="" id="lTeste" target="_blank" rel="noopener">Testar câmera</a>
+</header>
+<div class="app">
+  <section class="cam">
+    <div class="entrada" id="entrada">
+      <div class="caixa">
+        <h1 id="eTitulo">Bem-vindo aos bastidores</h1>
+        <p id="eTexto">Você vai entrar nos bastidores da live. A produção coloca você no ar quando for a hora.</p>
+        <label style="display:block;font-size:12px;color:var(--sub);margin-bottom:5px">Seu nome (aparece para a produção)</label>
+        <input id="nome" autocomplete="name" maxlength="60">
+        <ul>
+          <li>Use <b>fone de ouvido</b>, para não dar eco.</li>
+          <li>O navegador vai pedir <b>câmera e microfone</b>: clique em <b>Permitir</b>.</li>
+          <li id="dicaTela" hidden>Na hora de compartilhar, escolha a <b>tela</b> ou a <b>janela dos slides</b>.</li>
+        </ul>
+        <button class="pri" id="bEntrar" style="width:100%;padding:13px">Entrar nos bastidores</button>
+        <p class="erro" id="erro"></p>
+      </div>
+    </div>
+  </section>
+  <aside>
+    <h2>Chat com a produção</h2>
+    <div class="msgs" id="msgs"><div class="vazio">Mande uma mensagem se precisar de alguma coisa.</div></div>
+    <form id="form"><input id="texto" placeholder="Escreva para a produção" autocomplete="off" maxlength="500"><button class="pri">Enviar</button></form>
+  </aside>
+</div>
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const q=new URLSearchParams(location.search);
+const ID=q.get('l'),VAGA=q.get('v')||'c1',K=q.get('k');
+let live=null,desde=0,entrou=false;
+const KN='estudio4blue:convidado:nome';
+$('lTeste').href=CFG.TESTE_MENTOR||'teste-mentor.html';
+async function chamar(action,dados){return Api.post(action,Object.assign({id:ID,k:K,vaga:VAGA,nome:$('nome').value.trim()},dados||{}))}
+(async()=>{
+  try{
+    const r=await chamar('convidado.entrar');
+    live=r.live;
+    $('titulo').textContent=live.titulo;
+    $('subt').textContent=(live.inicio?new Date(live.inicio).toLocaleString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+' · ':'')+(VAGA==='tela'?'Compartilhar tela':'Convidado');
+    $('nome').value=localStorage.getItem(KN)||r.nome||'';
+    if(VAGA==='tela'){$('eTitulo').textContent='Compartilhar a tela';$('eTexto').textContent='Este link serve só para mostrar a tela ou os slides na live.';$('dicaTela').hidden=false;$('bEntrar').textContent='Escolher a tela'}
+    document.title=live.titulo+' — bastidores';
+    lerChat();
+  }catch(e){$('titulo').textContent='Convite inválido';$('erro').textContent=e.message;$('bEntrar').disabled=true}
+})();
+$('bEntrar').onclick=()=>{
+  const nome=$('nome').value.trim();if(!nome){$('erro').textContent='Escreva o seu nome';return}
+  localStorage.setItem(KN,nome);
+  const id=live.sala+'_'+VAGA;
+  const p=new URLSearchParams({room:live.sala,push:id,password:live.senhaSala,label:nome});
+  const extra=VAGA==='tela'?'&screenshare&quality=0':'&webcam&quality=1&echocancellation=1&noisesuppression=1&autogain=1';
+  const f=document.createElement('iframe');
+  f.allow='camera;microphone;display-capture;autoplay;fullscreen;clipboard-write';
+  f.src='https://vdo.ninja/?'+p.toString()+extra;
+  document.querySelector('.cam').appendChild(f);
+  $('entrada').hidden=true;entrou=true;
+  chamar('convidado.chat').catch(()=>{});
+};
+async function lerChat(){
+  try{
+    const r=await chamar('convidado.chat',{desde});
+    if(r.msgs&&r.msgs.length){
+      const box=$('msgs');if(!desde) box.innerHTML='';
+      r.msgs.forEach(m=>{
+        const d=document.createElement('div');
+        const eu=m.papel==='convidado'&&m.vaga===VAGA;
+        d.className='m '+(m.papel==='producao'?'prod':eu?'eu':'');
+        d.innerHTML=`<small>${esc(m.papel==='producao'?'Produção · '+m.nome:eu?'Você':m.nome)}</small>${esc(m.texto)}`;
+        box.appendChild(d);
+      });
+      box.scrollTop=box.scrollHeight;
+      desde=r.msgs[r.msgs.length-1].t;
+    }
+  }catch(e){}
+  setTimeout(lerChat,3000);
+}
+$('form').onsubmit=async e=>{
+  e.preventDefault();const t=$('texto').value.trim();if(!t)return;
+  if(!$('nome').value.trim()){$('nome').value=VAGA==='tela'?'Tela':'Convidado'}
+  $('texto').value='';
+  try{await chamar('convidado.enviar',{texto:t});setTimeout(()=>{},0)}catch(err){alert(err.message)}
+};
+</script>
+</body></html>

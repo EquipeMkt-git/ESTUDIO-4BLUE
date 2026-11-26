@@ -1,45 +1,52 @@
 # Estúdio 4blue: o substituto do StreamYard
 
-**Painel:** https://equipemkt-git.github.io/ESTUDIO-4BLUE/ (entra com a conta Google da 4blue)
-**Teste do mentor:** https://equipemkt-git.github.io/ESTUDIO-4BLUE/teste-mentor.html
+**Site:** https://equipemkt-git.github.io/ESTUDIO-4BLUE/ (entra com a conta Google da 4blue liberada em Admins)
+**Teste de câmera para convidados:** https://equipemkt-git.github.io/ESTUDIO-4BLUE/teste-mentor.html
 
-O painel fica online, mas comanda o **OBS do computador onde ele está aberto**. Abra o painel no mesmo PC que vai transmitir.
+## Como funciona
+- **Início (lives):** cada live é um card com data, tipo, convidados e link do YouTube. Os botões do card são **Entrar no estúdio**, **Convites** e **✎ editar**.
+- **+ Nova live:** título, data, hora e tipo.
+  - **🎙 Ao vivo:** apresentadores e convidados pela câmera, com tela compartilhada.
+  - **🎬 Vídeo gravado:** roda um vídeo como se fosse ao vivo. O estúdio entra no ar 5 minutos antes com a contagem, roda o vídeo no horário e encerra sozinho.
+- **Convites:** cada convidado recebe uma mensagem pronta para o WhatsApp. O link abre a página do convidado, com câmera, **chat com a produção** e o teste de câmera.
+- **Estúdio:** palco no estilo StreamYard.
+  - **Bastidores:** cada convidado aparece com o aviso "na sala" e o botão **Pôr no palco**. O layout se ajusta sozinho.
+  - **Aba Chat:** conversa com os convidados e a equipe.
+  - **Comentários:** do YouTube, levados para a tela com um clique.
+  - **Mais:** banners, letreiro, QR code, telas (abertura, intervalo, voltamos já, encerramento) e vídeos.
+- **Admins** (só para admin): libera e-mails @4blue.com.br. O **admin** libera pessoas e o **operador** cria e opera lives. Por ali também se conecta o canal do YouTube.
+- **❔ Como configurar:** o guia de instalação abre sozinho no primeiro acesso e pode ser aberto de novo quando quiser.
 
-## Primeira vez em cada PC (5 minutos)
-1. No OBS, vá em **Ferramentas → Configurações do servidor WebSocket**, marque **Habilitar** e copie a senha em **Mostrar informações de conexão**.
-2. Em **Configurações → Transmissão**, conecte a conta do YouTube (ou cole a chave). Em **Saída**, use 6000 kbps e o codificador da placa de vídeo (AMD/NVIDIA), se houver.
-3. Abra o painel, entre com o Google da 4blue e cole a senha do OBS.
-4. O painel prepara o OBS sozinho: cria as cenas, as telas na ID e os filtros de som. Basta clicar em **Preparar automaticamente**.
+## Primeira vez em cada PC
+O guia do site mostra estes passos:
+1. Instalar o OBS.
+2. Ligar o WebSocket do OBS e copiar a senha.
+3. Ligar o OBS ao YouTube (pela conta no OBS ou pelo botão "Configurar a transmissão" do estúdio).
+4. Entrar no estúdio e colar a senha. O estúdio prepara as cenas sozinho.
 
-## Em cada live
-1. **+ Convidar:** escreva o nome de cada pessoa e clique em **Copiar convite**. A mensagem já vai pronta para o WhatsApp, com o link de entrada e o teste de câmera.
-2. Escreva o **nome da live** no topo. Em **Marca**, coloque o horário de início, que alimenta a contagem da Abertura.
-3. Deixe a **Abertura** no ar e clique em **Entrar ao vivo**.
-4. Quem entra aparece nos **Bastidores**. Clique em **Pôr no palco** para colocar a pessoa no ar.
-   - O layout se ajusta sozinho: 1 pessoa ocupa a tela, 2 ficam lado a lado, 3 ficam em linha.
-   - Com a **tela compartilhada** no palco, a tela fica grande e as pessoas vão para a lateral.
-   - Para fixar um formato, use os botões de layout embaixo da prévia.
-5. O botão **🏷** de cada pessoa mostra o nome dela na tela. Na aba **Banners** ficam outros nomes, o **letreiro** e a **chamada com QR code**.
-6. Os botões **Intervalo** (com relógio), **Voltamos já** e **Encerramento** trocam a tela. **Voltar ao palco** retoma as pessoas.
-7. Em **Vídeos**, cole o caminho do arquivo e clique em ▶. Quando o vídeo acaba, a live volta sozinha ao palco.
-8. Em **Comentários**, cole o link da live e clique em **Ligar**. Um clique no comentário mostra ele na tela.
-9. **🎧 Falar com convidados** abre a sala para conversar com quem está nos bastidores antes de entrar no ar. Use fone.
+## YouTube: criar a live pelo sistema
+O canal da 4blue é uma **conta de marca**. O Apps Script, sozinho, só enxerga o canal pessoal do dono, então a criação automática precisa de uma conexão própria (OAuth) em que se escolhe o canal 4blue:
+1. No Google Cloud, crie um cliente OAuth do tipo "Aplicativo da Web" com a API YouTube Data v3 ativada.
+2. Cadastre como URI de redirecionamento a URL /exec do Apps Script, que aparece em Admins → Canal do YouTube.
+3. No Apps Script, em Configurações do projeto → Propriedades do script, crie `YT_CLIENT_ID` e `YT_CLIENT_SECRET`.
+4. No site, em Admins → **Conectar canal do YouTube**, escolha o canal da 4blue.
 
-## Bom saber
-- **Gerar sala nova** (em Configurações) a cada live: os convites antigos param de funcionar.
-- O topo mostra o uso do processador. Se ficar vermelho, desligue em Configurações o "vídeo dos convidados nos bastidores".
-- Com 8 GB de RAM, use no máximo 3 pessoas + 1 tela. Use cabo de rede: se a internet do PC cair, a live cai.
-- A fonte **Knockout** é paga e não fica no repositório. As telas usam a Knockout instalada no PC. Se o PC não tiver a fonte, entra uma fonte comum.
+Enquanto isso não for feito, crie a live no YouTube Studio e cole o link em **Convites** no card. Os comentários funcionam mesmo assim.
+
+## Backend
+Apps Script **ESTUDIO 4BLUE**, na conta dhione@4blue.com.br, com o código em `apps-script.gs`. Ele guarda lives e admins nas Propriedades do script, e o chat e a presença no Cache, por até 6 horas.
+Para atualizar: cole o código, salve e vá em **Implantar → Gerenciar implantações → ✎ → Nova versão**. A URL não muda.
 
 ## Arquivos
 | Arquivo | O que é |
 |---|---|
-| `index.html`, `painel.js` | O painel |
-| `overlay.html`, `fundo.html`, `abertura.html`, `intervalo.html`, `voltamos.html`, `encerramento.html` | O que o OBS mostra (o OBS carrega do site) |
-| `teste-mentor.html` | Teste de câmera, som e internet para o convidado |
-| `montar.js` | Cria as cenas no OBS e monta o palco |
-| `obs.js` | Conversa com o OBS |
-| `config.js` | Login, domínio e endereço do Apps Script |
-| `comentarios.gs` | Apps Script: confere o login e lê os comentários do YouTube |
+| `index.html`, `inicio.js` | Início: cards, nova live, convites, admins, guia |
+| `estudio.html`, `painel.js` | Estúdio |
+| `convidado.html` | Página do convidado (câmera + chat) |
+| `api.js`, `config.js` | Login e conversa com o Apps Script |
+| `obs.js`, `montar.js` | Conversa com o OBS, cenas e palco |
+| `overlay.html`, `fundo.html`, `abertura.html`, `intervalo.html`, `voltamos.html`, `encerramento.html`, `tela.js`, `estado.js`, `base.css` | O que o OBS mostra |
+| `teste-mentor.html` | Teste de câmera, som e internet |
+| `apps-script.gs` | Backend |
 
-Código: https://github.com/EquipeMkt-git/ESTUDIO-4BLUE
+A fonte Knockout é paga e não fica no repositório. As telas usam a Knockout instalada no PC e, se ela não estiver lá, entra uma fonte comum.

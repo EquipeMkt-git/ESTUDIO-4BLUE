@@ -1,7 +1,8 @@
 /* Estúdio 4blue — painel no estilo StreamYard.
    Online (GitHub Pages) com login Google da 4blue. Conversa com o OBS do próprio computador pelo WebSocket. */
 const $=id=>document.getElementById(id);
-const CFG=window.ESTUDIO_CONFIG||{};
+const LIVE_ID=new URLSearchParams(location.search).get('live')||'';
+let live=null;
 const ONLINE=/^https?:$/.test(location.protocol);
 const obs=new OBS();
 
@@ -22,7 +23,7 @@ const LAYOUTS=[
 const CENAS_PALCO=[CENAS.SOLO,CENAS.DUPLA,CENAS.TRIO,CENAS.TELA_MENTOR,CENAS.TELA_CHEIA];
 
 /* ---------- guardado neste navegador ---------- */
-const K_CFG='estudio4blue:config',K_EST='estudio4blue:painel',K_SES='estudio4blue:sessao';
+const K_CFG='estudio4blue:config',K_EST='estudio4blue:painel:'+LIVE_ID;
 const ler=k=>{try{return JSON.parse(localStorage.getItem(k)||'{}')}catch(e){return {}}};
 let cfg=Object.assign({host:'127.0.0.1',porta:'4455',senha:'',pasta:'',sala:'',senhaSala:'',nomes:{},cargos:{},videos:[],minis:true,previa:true},ler(K_CFG));
 if(typeof cfg.videos==='string') cfg.videos=cfg.videos.split('\n').map(s=>s.trim()).filter(Boolean);
@@ -35,7 +36,6 @@ function sortearSala(){
   const r=n=>Array.from(crypto.getRandomValues(new Uint8Array(n)),b=>'abcdefghjkmnpqrstuvwxyz23456789'[b%31]).join('');
   cfg.sala='aula4blue'+r(5);cfg.senhaSala=r(10);
 }
-if(!cfg.sala) sortearSala();
 salvarCfg();
 
 /* ---------- utilidades ---------- */
@@ -46,39 +46,9 @@ const abrir=id=>$(id).hidden=false, fechar=id=>$(id).hidden=true;
 document.querySelectorAll('[data-fechar]').forEach(b=>b.onclick=()=>b.closest('.fundo-modal').hidden=true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.fundo-modal:not(#mLogin)').forEach(m=>m.hidden=true)});
 function chave(id,ligado){$(id).classList.toggle('on',!!ligado)}
-const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-/* ---------- login Google da 4blue ---------- */
-let sessao=ler(K_SES);
-function sessaoValida(){return sessao&&sessao.exp>Date.now()&&sessao.email}
-function pedirLogin(){
-  abrir('mLogin');
-  const iniciar=()=>{
-    google.accounts.id.initialize({client_id:CFG.GOOGLE_CLIENT_ID,callback:entrarGoogle,ux_mode:'popup',auto_select:true,hd:CFG.DOMINIO});
-    google.accounts.id.renderButton($('gBotao'),{theme:'filled_black',size:'large',text:'signin_with',shape:'pill',locale:'pt-BR'});
-  };
-  if(window.google&&google.accounts) iniciar();
-  else{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=true;s.onload=iniciar;
-    s.onerror=()=>$('loginErro').textContent='Não consegui carregar o login do Google. Confira a internet.';document.head.appendChild(s)}
-}
-async function entrarGoogle(resp){
-  $('loginErro').textContent='Conferindo…';
-  try{
-    if(CFG.API_URL){
-      const r=await fetch(CFG.API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'login',credential:resp.credential})}).then(x=>x.json());
-      if(!r.ok) throw new Error(r.erro||'Login recusado');
-      sessao={email:r.email,nome:r.nome,token:r.token,exp:r.exp};
-    }else{
-      // sem o Apps Script ainda: confere o domínio no próprio navegador
-      const d=JSON.parse(decodeURIComponent(escape(atob(resp.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))));
-      if(String(d.email||'').toLowerCase().split('@')[1]!==CFG.DOMINIO) throw new Error('Use a conta Google da 4blue (@'+CFG.DOMINIO+').');
-      sessao={email:d.email,nome:d.name,token:'',exp:Date.now()+12*3600e3};
-    }
-    localStorage.setItem(K_SES,JSON.stringify(sessao));
-    fechar('mLogin');iniciarApp();
-  }catch(e){$('loginErro').textContent=e.message}
-}
-$('bSair').onclick=()=>{localStorage.removeItem(K_SES);location.reload()};
+$('bSair').onclick=()=>Api.sair();
+Api.aoExpirar=()=>Api.entrar();
 
 /* ---------- envio para overlay e telas ---------- */
 let envioT=null;
@@ -143,7 +113,8 @@ function marcarPrograma(){
 
 /* ---------- bastidores ---------- */
 const mudos={};
-function nomeVaga(v){return cfg.nomes[v.id]||''}
+const convidado=id=>((live&&live.convidados)||{})[id]||{};
+function nomeVaga(v){return convidado(v.id).nome||''}
 function desenharCards(){
   const box=$('cards');
   VAGAS.forEach(v=>{
@@ -161,7 +132,7 @@ function desenharCards(){
       if(bn) bn.onclick=()=>{
         if(!nomeVaga(v)) return aviso('Escreva o nome em + Convidar');
         const ja=est.banner.visivel&&est.banner.nome===nomeVaga(v);
-        est.banner=ja?{...est.banner,visivel:false}:{visivel:true,nome:nomeVaga(v),cargo:cfg.cargos[v.id]||''};
+        est.banner=ja?{...est.banner,visivel:false}:{visivel:true,nome:nomeVaga(v),cargo:convidado(v.id).cargo||''};
         enviar();desenharBanners();desenharCards();
       };
       box.appendChild(c);
@@ -199,13 +170,7 @@ obs.on('InputVolumeMeters',d=>{
 $('bFalar').onclick=()=>window.open(linkDiretor(cfg),'bastidores4blue');
 
 /* ---------- convites ---------- */
-function convite(v){
-  const nome=nomeVaga(v),link=linkConvidado(cfg,v.id,nome),teste=CFG.TESTE_MENTOR||'';
-  if(v.id==='tela') return `Link para compartilhar a tela na live da 4blue (abra numa aba separada e escolha a tela ou a janela dos slides):\n${link}`;
-  return `Olá${nome?' '+nome.split(' ')[0]:''}! Este é o seu link para entrar na live da 4blue:\n${link}\n\n`+
-    (teste?`Antes, faça o teste de câmera e som (3 minutos):\n${teste}\n\n`:'')+
-    `Use fone de ouvido e entre uns 15 minutos antes. Você vai cair nos bastidores e a gente te coloca no ar.`;
-}
+function convite(v){return textoConvite(live,v.id)}
 $('bConvidar').onclick=()=>{
   $('listaConv').innerHTML='';
   VAGAS.forEach(v=>{
@@ -214,8 +179,9 @@ $('bConvidar').onclick=()=>{
       <button class="pri" data-c>Copiar convite</button></div>
       ${v.id==='tela'?'':'<input placeholder="Cargo (para o nome na tela)" data-g style="margin-top:6px">'}`;
     const n=d.querySelector('[data-n]'),g=d.querySelector('[data-g]');
-    n.value=cfg.nomes[v.id]||'';n.oninput=()=>{cfg.nomes[v.id]=n.value.trim();salvarCfg();desenharCards()};
-    if(g){g.value=cfg.cargos[v.id]||'';g.oninput=()=>{cfg.cargos[v.id]=g.value.trim();salvarCfg()}}
+    const conv=()=>{live.convidados=live.convidados||{};return live.convidados[v.id]=live.convidados[v.id]||{}};
+    n.value=convidado(v.id).nome||'';n.oninput=()=>{conv().nome=n.value.trim();salvarLiveDepois();desenharCards()};
+    if(g){g.value=convidado(v.id).cargo||'';g.oninput=()=>{conv().cargo=g.value.trim();salvarLiveDepois()}}
     d.querySelector('[data-c]').onclick=()=>copiar(convite(v),'Convite copiado. Cole no WhatsApp.');
     $('listaConv').appendChild(d);
   });
@@ -285,6 +251,7 @@ async function tocar(p){
   }catch(e){aviso(e.message)}
 }
 obs.on('MediaInputPlaybackEnded',d=>{
+  if(d.inputName===FONTES.VIDEO&&programa===CENAS.GRAVADA) return fimGravada();
   if(d.inputName!==FONTES.VIDEO||programa!==CENAS.VIDEO) return;
   if(palcoAntesDoVideo) aplicarPalco(true); else if(cenaAntesDoVideo) irPara(cenaAntesDoVideo);
 });
@@ -304,9 +271,9 @@ async function lerChat(v){
   if(!chatLigado) return;
   let espera=8000;
   try{
-    const u=CFG.API_URL+'?acao=chat&v='+encodeURIComponent(v)+'&page='+encodeURIComponent(chatPage)+'&token='+encodeURIComponent(sessao.token||'');
+    const u=CFG.API_URL+'?acao=chat&v='+encodeURIComponent(v)+'&page='+encodeURIComponent(chatPage)+'&token='+encodeURIComponent(Api.sessao.token||'');
     const r=await fetch(u).then(x=>x.json());
-    if(r.relogar){localStorage.removeItem(K_SES);chatLigado=false;$('bChat').textContent='Ligar';return pedirLogin()}
+    if(r.relogar){chatLigado=false;$('bChat').textContent='Ligar';await Api.entrar();return}
     if(!r.ok){$('chatStatus').textContent=r.erro;espera=20000}
     else{
       chatPage=r.page||chatPage;espera=r.espera||8000;$('chatStatus').textContent='Ligado. Clique num comentário para mostrar na live.';
@@ -466,11 +433,151 @@ document.querySelectorAll('#abas button').forEach(b=>b.onclick=()=>{
 
 /* ---------- início ---------- */
 function iniciarApp(){
-  $('usuario').textContent=sessao&&sessao.email?sessao.email:'';
+  $('usuario').textContent=Api.sessao.email||'';
   chave('kLetreiro',est.letreiro.visivel);chave('kCta',est.cta.visivel);
   desenharLayouts();desenharCards();desenharBanners();desenharMarca();desenharVideos();desenharChat();marcarSaidas();previa();
   if(cfg.senha) conectar(); else abrir('mConectar');
 }
-// no próprio PC (arquivo ou localhost de teste) não pede login
-const LOCAL=!ONLINE||/^(localhost|127.0.0.1)$/.test(location.hostname);
-if(LOCAL||sessaoValida()) iniciarApp(); else pedirLogin();
+/* ---------- a live deste estúdio (vem do card) ---------- */
+let salvarLiveT=null;
+function salvarLiveDepois(){
+  clearTimeout(salvarLiveT);
+  salvarLiveT=setTimeout(async()=>{
+    try{const r=await Api.post('live.save',{live:{id:live.id,titulo:live.titulo,subtitulo:live.subtitulo,convidados:live.convidados,video:live.video,autoInicio:live.autoInicio,encerrarSozinho:live.encerrarSozinho}});live=Object.assign(live,r.live)}
+    catch(e){aviso('Não salvou: '+e.message)}
+  },1200);
+}
+function aplicarLive(){
+  cfg.sala=live.sala;cfg.senhaSala=live.senhaSala;
+  est.titulo=live.titulo||'';if(live.subtitulo) est.subtitulo=live.subtitulo;
+  if(live.inicio) est.inicio=live.inicio;
+  if(live.tema&&!localStorage.getItem(K_EST)) est.tema=live.tema;
+  $('titulo').value=est.titulo;$('tSub').value=est.subtitulo||'';
+  if(est.inicio){const d=new Date(est.inicio);$('tInicio').value=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+  if(live.youtube&&live.youtube.url&&!$('chatLink').value) $('chatLink').value=live.youtube.url;
+  document.title=live.titulo+' — Estúdio 4blue';
+  document.body.classList.toggle('gravada',live.tipo==='gravada');
+  $('gravada').hidden=live.tipo!=='gravada';
+  if(live.tipo==='gravada') prepararGravada();
+}
+$('titulo').addEventListener('input',()=>{live.titulo=$('titulo').value;salvarLiveDepois()});
+$('tSub').addEventListener('input',()=>{live.subtitulo=$('tSub').value;salvarLiveDepois()});
+
+/* ---------- chat com convidados e equipe ---------- */
+let eqDesde=0,eqNaoLidas=0,presenca={};
+async function lerEquipe(){
+  try{
+    const r=await Api.post('chat.list',{id:LIVE_ID,desde:eqDesde});
+    presenca=r.presenca||{};desenharPresenca();
+    if(r.msgs&&r.msgs.length){
+      const box=$('eqMsgs');if(!eqDesde) box.innerHTML='';
+      const aberta=$('aEquipe').classList.contains('sel');
+      r.msgs.forEach(m=>{
+        const d=document.createElement('div');const eu=m.papel==='producao'&&m.de===Api.sessao.email;
+        d.className='eq-m'+(eu?' eu':'');
+        const quem=m.papel==='producao'?(eu?'Você':m.nome+' · produção'):`${m.nome} · ${m.vaga==='tela'?'tela':'convidado'}`;
+        d.innerHTML=`<small>${esc(quem)} · ${new Date(m.t).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</small>${esc(m.texto)}`;
+        box.appendChild(d);
+        if(!aberta&&!eu&&eqDesde) eqNaoLidas++;
+      });
+      box.scrollTop=box.scrollHeight;
+      eqDesde=r.msgs[r.msgs.length-1].t;
+      marcarNaoLidas();
+    }
+  }catch(e){}
+  setTimeout(lerEquipe,3000);
+}
+function marcarNaoLidas(){$('naoLidas').hidden=!eqNaoLidas;$('naoLidas').textContent=eqNaoLidas}
+document.querySelector('[data-aba=aEquipe]').addEventListener('click',()=>{eqNaoLidas=0;marcarNaoLidas()});
+$('eqForm').onsubmit=async e=>{
+  e.preventDefault();const t=$('eqTexto').value.trim();if(!t)return;$('eqTexto').value='';
+  try{await Api.post('chat.send',{id:LIVE_ID,texto:t})}catch(err){aviso(err.message)}
+};
+const naSala=vaga=>presenca[vaga]&&Date.now()-presenca[vaga].t<25000;
+function desenharPresenca(){
+  $('presencas').innerHTML=VAGAS.map(v=>{
+    const p=presenca[v.id],on=naSala(v.id);
+    return `<span class="pres${on?' on':''}">${on?'●':'○'} ${esc((p&&p.nome)||nomeVaga(v)||v.rotulo)}</span>`;
+  }).join('');
+  VAGAS.forEach(v=>{
+    const c=document.querySelector(`[data-v="${v.id}"] .nome`);if(!c)return;
+    let s=c.querySelector('.na-sala');if(!s){s=document.createElement('span');s.className='na-sala';c.insertBefore(s,c.querySelector('button'))}
+    s.textContent=naSala(v.id)?'● na sala':'';
+  });
+}
+
+/* ---------- live com vídeo gravado ---------- */
+let gv={fase:'espera'};
+function prepararGravada(){
+  $('gvVideo').value=live.video||'';
+  chave('gvAuto',live.autoInicio!==false);chave('gvEncerrar',live.encerrarSozinho!==false);
+  setInterval(tickGravada,1000);
+}
+$('gvSalvar').onclick=()=>{live.video=$('gvVideo').value.trim().replace(/^"|"$/g,'');$('gvVideo').value=live.video;salvarLiveDepois();aviso('Vídeo salvo')};
+$('gvAuto').onclick=()=>{live.autoInicio=live.autoInicio===false;chave('gvAuto',live.autoInicio!==false);salvarLiveDepois()};
+$('gvEncerrar').onclick=()=>{live.encerrarSozinho=live.encerrarSozinho===false;chave('gvEncerrar',live.encerrarSozinho!==false);salvarLiveDepois()};
+$('gvAgora').onclick=()=>{if(confirm('Rodar o vídeo agora? Se a live ainda não estiver no ar, ela começa.'))rodarGravada()};
+$('gvContagem').onclick=()=>contagemGravada();
+function fmt(s){s=Math.max(0,Math.round(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (h?h+':':'')+String(m).padStart(h?2:1,'0')+':'+String(x).padStart(2,'0')}
+function statusGv(t){$('gvStatus').textContent=t}
+async function contagemGravada(){
+  if(!obs.conectado) return aviso('Conecte o OBS primeiro');
+  est.inicio=live.inicio;enviar();
+  await irPara(CENAS.ABERTURA);
+  if(!aoVivo) await obs.pedir('StartStream').catch(e=>aviso(e.message));
+  gv.fase='contagem';statusGv('No ar com a contagem');
+}
+async function rodarGravada(){
+  if(!obs.conectado) return aviso('Conecte o OBS primeiro');
+  const v=(live.video||'').trim();if(!v) return aviso('Coloque o caminho do vídeo');
+  try{
+    await obs.pedir('SetInputSettings',{inputName:FONTES.VIDEO,inputSettings:{local_file:v.replace(/\\/g,'/')}});
+    if(!aoVivo) await obs.pedir('StartStream');
+    await irPara(CENAS.GRAVADA);
+    await obs.pedir('TriggerMediaInputAction',{inputName:FONTES.VIDEO,mediaAction:'OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART'});
+    gv.fase='video';statusGv('▶ Vídeo no ar');
+  }catch(e){aviso(e.code===600?'Falta a cena do vídeo gravado no OBS: abra Configurações → Refazer cenas.':e.message,6000)}
+}
+async function fimGravada(){
+  gv.fase='fim';statusGv('Vídeo terminou');
+  await irPara(CENAS.ENCERRAMENTO);
+  if(live.encerrarSozinho!==false){
+    statusGv('Encerrando em 20 s…');
+    setTimeout(async()=>{if(gv.fase==='fim'&&aoVivo){await obs.pedir('StopStream').catch(()=>{});statusGv('Live encerrada')}},20000);
+  }
+}
+async function tickGravada(){
+  const ini=live.inicio;
+  if(!ini){$('gvRelogio').textContent='Defina data e hora da live no card';return}
+  const falta=(ini-Date.now())/1000;
+  if(gv.fase==='video'){
+    try{const s=await obs.pedir('GetMediaInputStatus',{inputName:FONTES.VIDEO});$('gvRelogio').textContent=`${fmt((s.mediaCursor||0)/1000)} de ${fmt((s.mediaDuration||0)/1000)}`}catch(e){}
+    return;
+  }
+  $('gvRelogio').textContent=gv.fase==='fim'?'Terminou':gv.fase==='contagem'?`No ar com a contagem · vídeo em ${fmt(falta)}`:falta>0?`Começa em ${fmt(falta)}`:'Horário de início já passou';
+  if(live.autoInicio===false||!obs.conectado) return;
+  if(gv.fase==='espera'&&falta<=300&&falta>-60) contagemGravada();
+  else if(gv.fase==='contagem'&&falta<=0) rodarGravada();
+}
+
+/* ---------- transmissão do YouTube no OBS ---------- */
+$('bTransmissao').onclick=async()=>{
+  if(!obs.conectado) return aviso('Conecte o OBS primeiro');
+  if(!confirm('Configurar o OBS para transmitir no canal conectado ao Estúdio? A configuração de transmissão atual do OBS é trocada.'))return;
+  try{
+    const k=await Api.post('youtube.chave');
+    await obs.pedir('SetStreamServiceSettings',{streamServiceType:'rtmp_custom',streamServiceSettings:{server:k.servidor,key:k.chave,use_auth:false}});
+    aviso('Pronto: o OBS transmite para o YouTube do Estúdio. As lives criadas pelo sistema já ficam ligadas a ele.',6000);
+  }catch(e){aviso(e.message,6000)}
+};
+
+/* ---------- início ---------- */
+(async()=>{
+  if(!LIVE_ID){location.replace('index.html');return}
+  await Api.garantir();
+  try{live=(await Api.post('live.get',{id:LIVE_ID})).live}
+  catch(e){document.body.innerHTML='<p style="padding:40px">'+esc(e.message)+' <a href="index.html">Voltar para as lives</a></p>';return}
+  aplicarLive();
+  iniciarApp();
+  lerEquipe();
+})();
